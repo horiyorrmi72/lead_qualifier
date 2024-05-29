@@ -76,8 +76,8 @@ app.post("/make-call", (req, res) => {
   Them: if i can get it within {{timeframe}}.
   You: When is a good day and time for me to schedule a meeting with one of our specialized agent via google meet they can share there screen and show you some more information and visuals?
   Them: {{day}} will be nice by {{time}}.
-  USES BookAppointment TOOLS
   You: Okay! Great meeting you ${name}, I'll go ahead and book you an appointment now
+  USES Book Appointment TOOLS
  
   
   INFORMATION ABOUT YOUR PROSPECT:
@@ -163,7 +163,7 @@ app.post("/make-call", (req, res) => {
 
       if (status)
       {
-        const webookUrl = "http://localhost:4001/updateCallIdWebhook";
+        const webookUrl = process.env.call_id_webhook_url;
         const webhookdata = {
           phoneNumber,
           call_id,
