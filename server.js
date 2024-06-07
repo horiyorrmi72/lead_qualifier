@@ -159,7 +159,7 @@ app.post("/make-call", (req, res) => {
     })
     .then((response) => {
       const { status, call_id } = response.data;
-      // console.log(response);
+      console.log(response);
 
       if (status)
       {
