@@ -134,16 +134,16 @@ app.post("/make-call", (req, res) => {
   const data = {
     phone_number: phoneNumber,
     task: prompt,
-    voice_id: 1,
+    voice_id: "2f9fdbc7-4bf2-4792-8a18-21ce3c93978f",
     reduce_latency: false,
     tools: tools,
-    analysis_schema: {
-      key_informations: {
-        appointment_date_and_time: "string",
-        property_type: "string",
-        budget: "string",
-      }
-    }
+    // analysis_schema: {
+    //   key_informations: {
+    //     appointment_date_and_time: "string",
+    //     property_type: "string",
+    //     budget: "string",
+    //   },
+    // },
   };
 
   // Dispatch the phone call
