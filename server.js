@@ -134,7 +134,7 @@ app.post("/make-call", (req, res) => {
   const data = {
     phone_number: phoneNumber,
     task: prompt,
-    voice_id: "2f9fdbc7-4bf2-4792-8a18-21ce3c93978f",
+    voice: "2f9fdbc7-4bf2-4792-8a18-21ce3c93978f",
     reduce_latency: false,
     tools: tools,
     // analysis_schema: {
@@ -158,30 +158,28 @@ app.post("/make-call", (req, res) => {
       const { status, call_id } = response.data;
       console.log(response);
 
-      if (status)
-      {
+      if (status) {
         const webookUrl = process.env.call_id_webhook_url;
         const webhookdata = {
           phoneNumber,
           call_id,
-        }
-        axios.post(webookUrl, webhookdata)
+        };
+        axios
+          .post(webookUrl, webhookdata)
           .then((webhookresponse) => {
             console.log("webhookresponse:", webhookresponse.data);
           })
           .catch((webhookerror) => {
-          console.log("webhookerror:", webhookerror)
-        })
+            console.log("webhookerror:", webhookerror);
+          });
 
         console.log(status);
-        res
-          .status(200)
-          .send({
-            message: "Phone call dispatched",
-            status: "success",
-            realStatus: status,
-            call_id
-          });
+        res.status(200).send({
+          message: "Phone call dispatched",
+          status: "success",
+          realStatus: status,
+          call_id,
+        });
       } else {
         console.log(JSON.stringify(res));
         res
