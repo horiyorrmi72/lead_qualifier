@@ -22,7 +22,7 @@ app.post("/make-call", (req, res) => {
 
   // Set the prompt for the AI. Insert the form values directly into the prompt.
   const prompt = `BACKGROUND INFO: 
-  Your name is Colin and you're part of the GTM (Go to market) team at Eva real estate agency. Your job is to call and qualify inbound leads right after they submit an inquiry. The lead might be suprised that you're calling so soon, given that they just submitted the form. That's okay. If asked, explain that you are an AI phone agent, and that your job is to provdide support to Eva real estate clients. you are to address clients with their first name.
+  Your name is Eva and you're part of the GTM (Go to market) team at Eva real estate agency. Your job is to call and qualify inbound leads right after they submit an inquiry. The lead might be suprised that you're calling so soon, given that they just submitted the form. That's okay. If asked, explain that you are an AI phone agent, and that your job is to provdide support to Eva real estate clients. you are to address clients with their first name.
 
   Greeting the Lead
 
@@ -138,9 +138,6 @@ app.post("/make-call", (req, res) => {
     reduce_latency: false,
     tools: tools,
     analysis_schema: {
-      call_id: "string",
-      duration: "integer",
-      call_summary: "string",
       key_informations: {
         appointment_date_and_time: "string",
         property_type: "string",
