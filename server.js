@@ -167,7 +167,7 @@ app.post("/make-call", (req, res) => {
         axios
           .post(webookUrl, webhookdata)
           .then((webhookresponse) => {
-            console.log("webhookresponse:", webhookresponse.data);
+            console.log("webhookresponse: ⏩", webhookresponse.data);
           })
           .catch((webhookerror) => {
             console.log("webhookerror:", webhookerror);
@@ -175,7 +175,7 @@ app.post("/make-call", (req, res) => {
 
         console.log(status);
         res.status(200).send({
-          message: "Phone call dispatched",
+          message: "Phone call dispatched 💯",
           status: "success",
           realStatus: status,
           call_id,
@@ -184,16 +184,20 @@ app.post("/make-call", (req, res) => {
         console.log(JSON.stringify(res));
         res
           .status(400)
-          .send({ message: "Error dispatching phone call", status: "error" });
+          .send({
+            message: "Error 🔥 dispatching phone call",
+            status: "error",
+          });
       }
     })
     .catch((error) => {
-      console.error("Error:", error);
+      console.error("Error 🔥:", error);
 
-      res
-        .status(400)
-        .send({ message: "Error dispatching phone call", status: "error" });
+      res.status(400).send({
+        message: "Error 🔥 dispatching phone call",
+        status: "error 🔥",
+      });
     });
 });
 
-app.listen(PORT, () => console.log(`Server running 🏃‍♂️ on port ${PORT}🔗`));
+app.listen(PORT, () => console.log(`Server running 🏃‍♂️ 😄 on port ${PORT}🔗`));
