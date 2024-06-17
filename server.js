@@ -136,6 +136,7 @@ app.post("/make-call", (req, res) => {
     task: prompt,
     voice: "2f9fdbc7-4bf2-4792-8a18-21ce3c93978f",
     reduce_latency: false,
+    record:true,
     tools: tools,
     // analysis_schema: {
     //   key_informations: {
@@ -200,4 +201,4 @@ app.post("/make-call", (req, res) => {
     });
 });
 
-app.listen(PORT, () => console.log(`Server running 🏃‍♂️ 😄 on port ${PORT}🔗`));
+app.listen(PORT, () => console.log(`Server  running 🏃‍♂️ 😄 on port ${PORT}🔗`));
