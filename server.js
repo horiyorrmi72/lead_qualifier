@@ -84,7 +84,7 @@ app.post("/make-call", (req, res) => {
   INFORMATION ABOUT YOUR PROSPECT:
   * Their name is ${name}
   * Their email is ${email}
-  * Their phone number is ${phone}
+  * Their phone number is ${phoneNumber}
   
   `;
 
