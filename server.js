@@ -141,13 +141,22 @@ app.post("/make-call", (req, res) => {
     webhook: process.env.call_webhook,
     record: true,
     tools: tools,
-    // analysis_schema: {
-    //   key_informations: {
-    //     appointment_date_and_time: "string",
-    //     property_type: "string",
-    //     budget: "string",
-    //   },
-    // },
+    calendly: {
+      url: "https://calendly.com/horiyorrmi72/30min",
+      timezone: "Africa/Lagos",
+    },
+    analysis_prompt:
+      "analyze the call to get the user requirements, needs and see if it is a good lead",
+    analysis_schema: {
+      email_address: String,
+      property_type: String,
+      budget: String,
+      isLead: Boolean,
+
+
+
+    },
+    
   };
 
   // Dispatch the phone call
