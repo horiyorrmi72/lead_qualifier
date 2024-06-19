@@ -150,13 +150,19 @@ app.post("/make-call", (req, res) => {
     analysis_schema: {
       email_address: String,
       property_type: String,
+      property_description: String,
+      property_sizes: String,
       budget: String,
       isLead: Boolean,
-
-
-
+      lead_quality_score: Number,
+      user_has_booked_appointment: Boolean,
+      user_wants_to_buy_property: Boolean,
+      user_wants_to_sell_property: Boolean,
+      user_nationality: String,
+      appointment_time: String,
+      other_requirements: String,
+      
     },
-    
   };
 
   // Dispatch the phone call
