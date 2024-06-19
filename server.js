@@ -138,7 +138,7 @@ app.post("/make-call", (req, res) => {
     task: prompt,
     voice: "2f9fdbc7-4bf2-4792-8a18-21ce3c93978f",
     reduce_latency: false,
-    webhook: "https://d9a1-102-88-62-91.ngrok-free.app/testwebhookbland",
+    webhook: process.env.call_webhook,
     record: true,
     tools: tools,
     // analysis_schema: {
