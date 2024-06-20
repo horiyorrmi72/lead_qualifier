@@ -146,11 +146,29 @@ app.post("/make-call", (req, res) => {
       timezone: "Africa/Lagos",
     },
     analysis_prompt:
-      "analyze the call to get the user requirements, needs and see if it is a good lead",
+      ```analyze the call to extract the user requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
+        - Email Address: The email address of the client.
+        - Property Market Type: The type of property market the client is interested in (off-plan, secondary market).
+        - Property Description: A brief description of the property the client is looking for.
+        - Property Location: The desired location of the property or where the perty that intrest the client is situated.
+        - Property Purpose: The purpose of the property (e.g., investment, personal use).
+        - Property Sizes: The preferred size(s) of the property.
+        - Budget: The client's budget for the property.
+        -IsLead: Whether the client is a potential lead (true/false).
+        -Lead Quality Score: A numerical score representing the quality of the lead on a scale of 1 to 10.
+        -User Has Booked Appointment: Whether the client has booked an appointment (true/false).
+        -User Wants to Buy Property: Whether the client wants to buy a property (true/false).
+        -User Wants to Sell Property: Whether the client wants to sell a property (true/false).
+        -User Nationality: The nationality of the client.
+        -Appointment Time: The scheduled time for the appointment, if any.
+        -Other Requirements: Any additional requirements mentioned by the client.```,
+
     analysis_schema: {
       email_address: String,
-      property_type: String,
+      property_market_type: String,
       property_description: String,
+      property_location: String,
+      property_purpose: String,
       property_sizes: String,
       budget: String,
       isLead: Boolean,
