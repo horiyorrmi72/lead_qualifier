@@ -143,7 +143,7 @@ app.post("/make-call", (req, res) => {
     tools: tools,
     calendly: {
       headers: {
-        Authorization: "Bearer cal_live_3b752342ed337578175f4db5d935fe08",
+        Authorization: process.env.cal_api_key,
       },
       url: process.env.appointment_endpoint_url,
       timezone: "Africa/Lagos",
