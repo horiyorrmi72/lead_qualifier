@@ -148,7 +148,7 @@ app.post("/make-call", (req, res) => {
       url: process.env.appointment_endpoint_url,
       timezone: "Africa/Lagos",
     },
-    analysis_prompt: ```analyze the call to extract the user requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
+    analysis_prompt: `analyze the call to extract the user requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
         - Email Address: The email address of the client.
         - Property Market Type: The type of property market the client is interested in (off-plan, secondary market).
         - Property Description: A brief description of the property the client is looking for.
@@ -163,7 +163,7 @@ app.post("/make-call", (req, res) => {
         -User Wants to Sell Property: Whether the client wants to sell a property (true/false).
         -User Nationality: The nationality of the client.
         -Appointment Time: The scheduled time for the appointment, if any.
-        -Other Requirements: Any additional requirements mentioned by the client.```,
+        -Other Requirements: Any additional requirements mentioned by the client.`,
 
     analysis_schema: {
       email_address: String,
