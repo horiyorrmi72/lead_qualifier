@@ -111,7 +111,7 @@ app.post("/make-call", (req, res) => {
       },
       body: {},
       query: {
-        apikey: "",
+        apikey: process.env.check_availability,
         startTime: "{{appointment_time}}",
         endTime: "{{appointment_end_time}}",
         timeZone: "Asia/Dubai",
@@ -165,7 +165,7 @@ app.post("/make-call", (req, res) => {
           responses: {
             name: "client's name",
             email: "client_email@mail.com",
-            location:"google meet"
+            location: "google meet",
           },
           timeZone: "Asia/Dubai",
           title:
@@ -189,7 +189,7 @@ app.post("/make-call", (req, res) => {
         description: "{{input.description}}",
         smsReminderNumber: "{{input.smsReminderNumber}}",
       },
-      
+
       response: {
         succesfully_booked_slot: "$.success",
       },
