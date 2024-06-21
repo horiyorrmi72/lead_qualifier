@@ -103,10 +103,10 @@ app.post("/make-call", (req, res) => {
       description:
         "checks clients prefered date and time against calendar availability",
       speech: "please wait a moment while i check for available slots",
-      url: "https://api.cal.com/v1/slots",
+      url: `https://api.cal.com/v1/slots?apikey=${query.apikey}&startTime=${query.startTime}&endTime=${query.endTime}&timeZone=${query.timeZone}&eventTypeId=${query.eventTypeId}`,
       method: "GET",
       headers: {
-        authorization: process.env.BLAND_API_KEY,
+        Authorization: process.env.BLAND_API_KEY,
         "Content-Type": "application/json",
       },
       body: {},
@@ -156,7 +156,7 @@ app.post("/make-call", (req, res) => {
         Authorization: process.env.BLAND_API_KEY,
         "Content-Type": "application/json",
       },
-      method: "POST",
+
       input_schema: {
         example: {
           eventTypeId: "768315",
@@ -207,6 +207,7 @@ app.post("/make-call", (req, res) => {
     tools: tools,
     
     analysis_prompt: `analyze the call to extract the user requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
+        - name: The client's name.
         - Email Address: The email address of the client.
         - Property Market Type: The type of property market the client is interested in (off-plan, secondary market).
         - Property Description: A brief description of the property the client is looking for.
@@ -224,6 +225,7 @@ app.post("/make-call", (req, res) => {
         -Other Requirements: Any additional requirements mentioned by the client.`,
 
     analysis_schema: {
+      name:String,
       email_address: String,
       property_market_type: String,
       property_description: String,
