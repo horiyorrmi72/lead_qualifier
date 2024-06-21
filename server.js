@@ -77,6 +77,11 @@ app.post("/make-call", (req, res) => {
   Them: if i can get it within {{timeframe}}.
   You: When is a good day and time for me to schedule a meeting with one of our specialized agent via google meet they can share there screen and show you some more information and visuals?
   Them: {{day}} will be nice by {{time}}.
+  You: please wait while i check that against the calender for availability
+  USES checkAvailability TOOLS using the selected {{day}} and {{time}} as the startTime against the whole day as the endTime. example if client choose Friday 21st of June 2024 1pm, startTime=2024-06-21T00:00:00, endTime=2024-06-21T24:00:00 now check if the client choosen timeframe is available within the available slots otherwise provide client with available future slots.
+  Them: Ok, what are the slots available since that time is not available
+  You: provide client with available future slots. 
+  Them: Ok, example client choose 4pm from the list of the available slots
   You: Okay! Great meeting you ${name}, I'll go ahead and book you an appointment now
   USES Book Appointment TOOLS
  
@@ -94,40 +99,99 @@ app.post("/make-call", (req, res) => {
   //create custom tools for the phone agent such as booking appointments and so on.
   const tools = [
     {
-      name: "BookAppointment",
-      description: "Books an appointment for the customer",
-      url: process.env.appointment_endpoint_url,
-      method: "POST",
+      name: "checkAvailability",
+      description:
+        "checks clients prefered date and time against calendar availability",
+      speech: "please wait a moment while i check for available slots",
+      url: "https://api.cal.com/v1/slots",
+      method: "GET",
       headers: {
-        Authorization: "Bearer cal_live_3b752342ed337578175f4db5d935fe08",
+        authorization: process.env.BLAND_API_KEY,
+        "Content-Type": "application/json",
       },
-      body: {
-        date: "{{input.date}}",
-        time: "{{input.time}}",
-        service: "{{input.service}}",
+      body: {},
+      query: {
+        apikey: "",
+        startTime: "{{appointment_time}}",
+        endTime: "{{appointment_end_time}}",
+        timeZone: "Asia/Dubai",
+        eventTypeId: process.env.cal_eventTypeId,
       },
       input_schema: {
-        example: [
-          {
-            speech:
-              "Got it - one second while I book your appointment for next week monday at 10 AM.",
-            date: "2024-05-13",
-            time: "10:00 AM",
-            service:
-              "call with client name regarding emirate towers at marina city with the swimming pool and garden",
-          },
-        ],
+        example: {
+          apikey: "cal_234fjshbfujioal.da;poejru",
+          startDate: "2024-06-22T00:00:00",
+          endTime: "2024-06-22T24:00:00",
+          timeZone: "Asia/Dubai",
+          eventTypeId: "768315",
+        },
         type: "object",
         properties: {
-          speech: "string",
-          date: "YYYY-MM-DD",
-          time: "HH:MM AM/PM",
-          service: "meeting, call,or Other",
+          startTime: {
+            type: "date",
+          },
+          endTime: {
+            type: "date",
+          },
+          timeZone: {
+            type: "string",
+          },
+          eventTypeId: {
+            type: "string",
+          },
+        },
+        response: {
+          slots: "$.slots",
+        },
+        timeout: 10000,
+      },
+    },
+    {
+      name: "BookAppointment",
+      description: "Books an appointment for the customer",
+      speech: "Booking your appointment, a moment please.",
+      url: "https://api.cal.com/v1/bookings",
+      method: "POST",
+      headers: {
+        Authorization: process.env.BLAND_API_KEY,
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      input_schema: {
+        example: {
+          eventTypeId: "768315",
+          start: "2024-06-21T09:00:00",
+          end: "2024-06-22T01:00:00",
+          responses: {
+            name: "client's name",
+            email: "client_email@mail.com",
+            location:"google meet"
+          },
+          timeZone: "Asia/Dubai",
+          title:
+            "meeting with eva real estate agency regading listing intrests",
+          description:
+            "you will be having a meeting with agent to give you more insight regarding your listing intrest ",
+          smsReminderNumber: "+2349095176621",
         },
       },
+      body: {
+        eventTypeId: process.env.cal_eventTypeId,
+        start: "{{input.start}}",
+        end: "{{input.end}}",
+        timeZone: "Asia/Dubai",
+        responses: {
+          name: "{{input.responses.name}}",
+          email: "{{input.responses.email}}",
+          location: "{{input.responses.location}}",
+        },
+        title: "{{input.title}}",
+        description: "{{input.description}}",
+        smsReminderNumber: "{{input.smsReminderNumber}}",
+      },
+      
       response: {
         succesfully_booked_slot: "$.success",
-        stylist_name: "$.stylist_name",
       },
     },
   ];
@@ -141,13 +205,7 @@ app.post("/make-call", (req, res) => {
     webhook: process.env.call_webhook,
     record: true,
     tools: tools,
-    calendly: {
-      headers: {
-        Authorization: process.env.cal_api_key,
-      },
-      url: process.env.appointment_endpoint_url,
-      timezone: "Africa/Lagos",
-    },
+    
     analysis_prompt: `analyze the call to extract the user requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
         - Email Address: The email address of the client.
         - Property Market Type: The type of property market the client is interested in (off-plan, secondary market).
@@ -220,12 +278,10 @@ app.post("/make-call", (req, res) => {
         });
       } else {
         console.log(JSON.stringify(res));
-        res
-          .status(400)
-          .send({
-            message: "Error 🔥 dispatching phone call",
-            status: "error",
-          });
+        res.status(400).send({
+          message: "Error 🔥 dispatching phone call",
+          status: "error",
+        });
       }
     })
     .catch((error) => {
@@ -239,4 +295,3 @@ app.post("/make-call", (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Server  running 🏃‍♂️ 😄 on port ${PORT}🔗`));
-
