@@ -109,13 +109,17 @@ app.post("/make-call", (req, res) => {
         "Content-Type": "application/json",
       },
       body: {},
-      url: `https://api.cal.com/v1/slots?apikey=${process.env.check_availability}&startTime=${startTime}&endTime=${endTime}&timeZone=${timeZone}&eventTypeId=${eventTypeId}`,
       query: {
         apikey: process.env.check_availability,
         startTime: "{{appointment_time}}",
         endTime: "{{appointment_end_time}}",
         timeZone: "Asia/Dubai",
         eventTypeId: process.env.cal_eventTypeId,
+      },
+      url() {
+        const { apikey, startTime, endTime, timeZone, eventTypeId } =
+          this.query;
+        return `https://api.cal.com/v1/slots?apikey=${apikey}&startTime=${startTime}&endTime=${endTime}&timeZone=${timeZone}&eventTypeId=${eventTypeId}`;
       },
       input_schema: {
         example: {
@@ -156,7 +160,6 @@ app.post("/make-call", (req, res) => {
         Authorization: process.env.BLAND_API_KEY,
         "Content-Type": "application/json",
       },
-
       input_schema: {
         example: {
           eventTypeId: "768315",
@@ -189,7 +192,6 @@ app.post("/make-call", (req, res) => {
         description: "{{input.description}}",
         smsReminderNumber: "{{input.smsReminderNumber}}",
       },
-
       response: {
         succesfully_booked_slot: "$.booking",
       },
