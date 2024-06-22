@@ -101,30 +101,26 @@ app.post("/make-call", (req, res) => {
     {
       name: "checkAvailability",
       description:
-        "Checks client's preferred date and time against calendar availability",
-      speech: "Please wait a moment while I check for available slots",
+        "checks clients prefered date and time against calendar availability",
+      speech: "please wait a moment while i check for available slots",
       method: "GET",
       headers: {
         Authorization: process.env.BLAND_API_KEY,
         "Content-Type": "application/json",
       },
       body: {},
-      getUrl: (query) => {
-        return `https://api.cal.com/v1/slots?apikey=${query.apikey}&startTime=${query.startTime}&endTime=${query.endTime}&timeZone=${query.timeZone}&eventTypeId=${query.eventTypeId}`;
-      },
+      url: `https://api.cal.com/v1/slots?apikey=${process.env.check_availability}&startTime=${startTime}&endTime=${endTime}&timeZone=${timeZone}&eventTypeId=${eventTypeId}`,
       query: {
+        apikey: process.env.check_availability,
         startTime: "{{appointment_time}}",
         endTime: "{{appointment_end_time}}",
         timeZone: "Asia/Dubai",
         eventTypeId: process.env.cal_eventTypeId,
       },
-      url: function () {
-        return this.getUrl(this.query);
-      },
       input_schema: {
         example: {
           apikey: "cal_234fjshbfujioal.da;poejru",
-          startTime: "2024-06-22T00:00:00",
+          startDate: "2024-06-22T00:00:00",
           endTime: "2024-06-22T24:00:00",
           timeZone: "Asia/Dubai",
           eventTypeId: "768315",
@@ -132,12 +128,10 @@ app.post("/make-call", (req, res) => {
         type: "object",
         properties: {
           startTime: {
-            type: "string",
-            format: "date-time",
+            type: "date",
           },
           endTime: {
-            type: "string",
-            format: "date-time",
+            type: "date",
           },
           timeZone: {
             type: "string",
@@ -146,11 +140,11 @@ app.post("/make-call", (req, res) => {
             type: "string",
           },
         },
+        response: {
+          slots: "$.slots",
+        },
+        timeout: 10000,
       },
-      response: {
-        slots: "$.slots",
-      },
-      timeout: 10000,
     },
     {
       name: "BookAppointment",
@@ -162,6 +156,7 @@ app.post("/make-call", (req, res) => {
         Authorization: process.env.BLAND_API_KEY,
         "Content-Type": "application/json",
       },
+
       input_schema: {
         example: {
           eventTypeId: "768315",
@@ -174,50 +169,10 @@ app.post("/make-call", (req, res) => {
           },
           timeZone: "Asia/Dubai",
           title:
-            "Meeting with Eva Real Estate Agency regarding listing interests",
+            "meeting with eva real estate agency regading listing intrests",
           description:
-            "You will be having a meeting with an agent to give you more insight regarding your listing interest",
+            "you will be having a meeting with agent to give you more insight regarding your listing intrest ",
           smsReminderNumber: "+2349095176621",
-        },
-        type: "object",
-        properties: {
-          eventTypeId: {
-            type: "string",
-          },
-          start: {
-            type: "string",
-            format: "date-time",
-          },
-          end: {
-            type: "string",
-            format: "date-time",
-          },
-          responses: {
-            type: "object",
-            properties: {
-              name: {
-                type: "string",
-              },
-              email: {
-                type: "string",
-              },
-              location: {
-                type: "string",
-              },
-            },
-          },
-          timeZone: {
-            type: "string",
-          },
-          title: {
-            type: "string",
-          },
-          description: {
-            type: "string",
-          },
-          smsReminderNumber: {
-            type: "string",
-          },
         },
       },
       body: {
@@ -234,12 +189,12 @@ app.post("/make-call", (req, res) => {
         description: "{{input.description}}",
         smsReminderNumber: "{{input.smsReminderNumber}}",
       },
+
       response: {
         succesfully_booked_slot: "$.booking",
       },
     },
   ];
-
 
   // Create the parameters for the phone call. Ref: https://docs.bland.ai/api-reference/endpoint/call
   const data = {
