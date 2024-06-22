@@ -109,12 +109,17 @@ app.post("/make-call", (req, res) => {
         "Content-Type": "application/json",
       },
       body: {},
-      url: `https://api.cal.com/v1/slots?apikey=${process.env.check_availability}&startTime=${this.query.startTime}&endTime=${this.query.endTime}&timeZone=${this.query.timeZone}&eventTypeId=${this.query.eventTypeId}`,
+      getUrl: (query) => {
+        return `https://api.cal.com/v1/slots?apikey=${query.apikey}&startTime=${query.startTime}&endTime=${query.endTime}&timeZone=${query.timeZone}&eventTypeId=${query.eventTypeId}`;
+      },
       query: {
         startTime: "{{appointment_time}}",
         endTime: "{{appointment_end_time}}",
         timeZone: "Asia/Dubai",
         eventTypeId: process.env.cal_eventTypeId,
+      },
+      url: function () {
+        return this.getUrl(this.query);
       },
       input_schema: {
         example: {
@@ -190,7 +195,7 @@ app.post("/make-call", (req, res) => {
       },
 
       response: {
-        succesfully_booked_slot: "$.success",
+        succesfully_booked_slot: "$.booking",
       },
     },
   ];
