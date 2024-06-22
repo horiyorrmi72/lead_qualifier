@@ -126,36 +126,41 @@ app.post("/make-call", (req, res) => {
     },
     {
       name: "BookAppointment",
-      description: "Books an appointment for the customer",
-      speech: "Booking your appointment, a moment please.",
-      url: "https://4de2-102-89-32-122.ngrok-free.app/booker",
-      method: "POST",
-      headers: {
-        Authorization: process.env.BLAND_API_KEY,
-        "Content-Type": "application/json",
-      },
-
-      input_schema: {
-        example: {
-          start: "2024-06-24T09:30:00.000Z",
-          name: "ola",
-          email: "ola@mail.com",
-          smsReminderNumber: "+2349095176621",
-        },
-        properties: {
-          name: "",
-          email: "",
-        },
-        description:
-          "you will be having a meeting with agent to give you more insight regarding your listing intrest ",
-      },
-      body: {
-        start: "{{input.start}}",
-        name: "{{input.name}}",
-        email: "{{input.email}}",
-        smsReminderNumber: "{{input.smsReminderNumber}}",
-      },
+    description: "Books an appointment for the customer",
+    speech: "Booking your appointment, a moment please.",
+    url: "https://4de2-102-89-32-122.ngrok-free.app/booker",
+    method: "POST",
+    headers: {
+      Authorization: process.env.BLAND_API_KEY,
+      "Content-Type": "application/json"
     },
+    body: {
+      start: "{{input.start}}",
+      name: "{{input.name}}",
+      email: "{{input.email}}",
+      smsReminderNumber: "{{input.smsReminderNumber}}"
+    },
+    query: {},
+    input_schema: {
+      example: {
+        start: "2024-06-24T09:30:00.000Z",
+        name: "ola",
+        email: "ola@mail.com",
+        smsReminderNumber: "+2349095176621"
+      },
+      properties: {
+        start: { type: "string", format: "date-time" },
+        name: { type: "string" },
+        email: { type: "string" },
+        smsReminderNumber: { type: "string" }
+      },
+      description: "You will be having a meeting with an agent to give you more insight regarding your listing interest."
+    },
+    response: {
+      succesfully_booked_slot: "$.success"
+    },
+    timeout: 123
+  }
   ];
 
   // Create the parameters for the phone call. Ref: https://docs.bland.ai/api-reference/endpoint/call
