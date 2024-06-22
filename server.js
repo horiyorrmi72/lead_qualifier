@@ -103,44 +103,26 @@ app.post("/make-call", (req, res) => {
       description:
         "checks clients prefered date and time against calendar availability",
       speech: "please wait a moment while i check for available slots",
+      url: "https://ai-crm.fastgenapp.com/slotsV1",
       method: "GET",
       headers: {
         Authorization: process.env.BLAND_API_KEY,
         "Content-Type": "application/json",
       },
-      body: {},
-      query: {
-        apikey: process.env.check_availability,
-        startTime: "{{appointment_time}}",
-        endTime: "{{appointment_end_time}}",
-        timeZone: "Asia/Dubai",
-        eventTypeId: process.env.cal_eventTypeId,
+      body: {
+        startTime: "{{ input.startTime }}",
+        endTime: "{{ input.endTime }}",
+  
       },
-      url() {
-        const { apikey, startTime, endTime, timeZone, eventTypeId } =
-          this.query;
-        return `https://api.cal.com/v1/slots?apikey=${apikey}&startTime=${startTime}&endTime=${endTime}&timeZone=${timeZone}&eventTypeId=${eventTypeId}`;
-      },
+      query: {},
       input_schema: {
-        example: {
-          apikey: "cal_234fjshbfujioal.da;poejru",
-          startDate: "2024-06-22T00:00:00",
-          endTime: "2024-06-22T24:00:00",
-          timeZone: "Asia/Dubai",
-          eventTypeId: "768315",
-        },
+        example: {},
         type: "object",
         properties: {
           startTime: {
-            type: "date",
-          },
-          endTime: {
-            type: "date",
-          },
-          timeZone: {
             type: "string",
           },
-          eventTypeId: {
+          endTime: {
             type: "string",
           },
         },
@@ -154,46 +136,40 @@ app.post("/make-call", (req, res) => {
       name: "BookAppointment",
       description: "Books an appointment for the customer",
       speech: "Booking your appointment, a moment please.",
-      url: "https://api.cal.com/v1/bookings",
+      url: "https://ai-crm.fastgenapp.com/booker",
       method: "POST",
       headers: {
         Authorization: process.env.BLAND_API_KEY,
         "Content-Type": "application/json",
       },
+
       input_schema: {
         example: {
-          eventTypeId: "768315",
-          start: "2024-06-21T09:00:00",
-          end: "2024-06-21T09:30:00",
-          responses: {
-            name: "client's name",
-            email: "client_email@mail.com",
-            location: "google meet",
-          },
-          timeZone: "Asia/Dubai",
-          title:
-            "meeting with eva real estate agency regading listing intrests",
+          meetingTime: "2024-06-21T09:00:00",
+          name: "ola",
+          email: "ola@mail.com",
+          smsReminderNumber: "+2349095176621"
+        },
+        properties: {
+          "name": "",
+          "email": "",
+
+        },
           description:
             "you will be having a meeting with agent to give you more insight regarding your listing intrest ",
           smsReminderNumber: "+2349095176621",
-        },
+        
       },
       body: {
-        eventTypeId: process.env.cal_eventTypeId,
-        start: "{{input.start}}",
-        end: "{{input.end}}",
-        timeZone: "Asia/Dubai",
-        responses: {
-          name: "{{input.responses.name}}",
-          email: "{{input.responses.email}}",
-          location: "{{input.responses.location}}",
+        meetingTime:"{{input.meetingTime}}",
+        name: "{{input.name}}",
+        email: "{{input.email}}",
+        smsReminderNumber:"{{input.smsReminderNumber}}"
         },
-        title: "{{input.title}}",
-        description: "{{input.description}}",
-        smsReminderNumber: "{{input.smsReminderNumber}}",
-      },
+      
+
       response: {
-        succesfully_booked_slot: "$.booking",
+        succesfully_booked_slot: "$.success",
       },
     },
   ];
