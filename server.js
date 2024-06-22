@@ -103,8 +103,8 @@ app.post("/make-call", (req, res) => {
       description:
         "checks clients prefered date and time against calendar availability",
       speech: "please wait a moment while i check for available slots",
-      url: `https://api.cal.com/v1/slots?apikey=${query.apikey}&startTime=${query.startTime}&endTime=${query.endTime}&timeZone=${query.timeZone}&eventTypeId=${query.eventTypeId}`,
       method: "GET",
+      url: `https://api.cal.com/v1/slots?apikey=${this.query.apikey}&startTime=${this.query.startTime}&endTime=${this.query.endTime}&timeZone=${this.query.timeZone}&eventTypeId=${this.query.eventTypeId}`,
       headers: {
         Authorization: process.env.BLAND_API_KEY,
         "Content-Type": "application/json",
@@ -161,7 +161,7 @@ app.post("/make-call", (req, res) => {
         example: {
           eventTypeId: "768315",
           start: "2024-06-21T09:00:00",
-          end: "2024-06-22T01:00:00",
+          end: "2024-06-21T09:30:00",
           responses: {
             name: "client's name",
             email: "client_email@mail.com",
