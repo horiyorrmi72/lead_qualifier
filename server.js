@@ -99,77 +99,29 @@ app.post("/make-call", (req, res) => {
   //create custom tools for the phone agent such as booking appointments and so on.
   const tools = [
     {
-      name: "checkAvailability",
-      description:
-        "checks clients prefered date and time against calendar availability",
-      speech: "please wait a moment while i check for available slots",
-      url: "https://ai-crm.fastgenapp.com/slotsV1",
-      method: "GET",
+      name: "check availability",
+      description: "check selected date and time if available on my calendar",
+      url: "https://ai-crm.fastgenapp.com/availability",
+      method: "POST",
       headers: {
-        Authorization: process.env.BLAND_API_KEY,
         "Content-Type": "application/json",
-      },
-      body: {
-        startTime: "{{ input.startTime }}",
-        endTime: "{{ input.endTime }}",
-  
       },
       query: {},
       input_schema: {
-        example: {},
-        type: "object",
-        properties: {
-          startTime: {
-            type: "string",
-          },
-          endTime: {
-            type: "string",
-          },
-        },
-        response: {
-          slots: "$.slots",
-        },
-        timeout: 10000,
-      },
-    },
-    {
-      name: "BookAppointment",
-      description: "Books an appointment for the customer",
-      speech: "Booking your appointment, a moment please.",
-      url: "https://ai-crm.fastgenapp.com/booker",
-      method: "POST",
-      headers: {
-        Authorization: process.env.BLAND_API_KEY,
-        "Content-Type": "application/json",
-      },
-
-      input_schema: {
         example: {
-          meetingTime: "2024-06-21T09:00:00",
-          name: "ola",
-          email: "ola@mail.com",
-          smsReminderNumber: "+2349095176621"
+          endTime: "2024-06-24T16:30:00.000Z",
+          startTime: "2024-06-24T09:30:00.000Z",
         },
         properties: {
-          "name": "",
-          "email": "",
-
+          endTime: "",
+          startTime: "",
         },
-          description:
-            "you will be having a meeting with agent to give you more insight regarding your listing intrest ",
-          smsReminderNumber: "+2349095176621",
-        
       },
+      speech:
+        "please wait a moment while i check if that date and time is available",
       body: {
-        meetingTime:"{{input.meetingTime}}",
-        name: "{{input.name}}",
-        email: "{{input.email}}",
-        smsReminderNumber:"{{input.smsReminderNumber}}"
-        },
-      
-
-      response: {
-        succesfully_booked_slot: "$.success",
+        endTime: "{{input.endTime}}",
+        startTime: "{{input.startTime}}",
       },
     },
   ];
@@ -183,7 +135,7 @@ app.post("/make-call", (req, res) => {
     webhook: process.env.call_webhook,
     record: true,
     tools: tools,
-    
+
     analysis_prompt: `analyze the call to extract the user requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
         - name: The client's name.
         - Email Address: The email address of the client.
@@ -203,7 +155,7 @@ app.post("/make-call", (req, res) => {
         -Other Requirements: Any additional requirements mentioned by the client.`,
 
     analysis_schema: {
-      name:String,
+      name: String,
       email_address: String,
       property_market_type: String,
       property_description: String,
