@@ -104,7 +104,6 @@ app.post("/make-call", (req, res) => {
         "checks clients prefered date and time against calendar availability",
       speech: "please wait a moment while i check for available slots",
       method: "GET",
-      url: `https://api.cal.com/v1/slots?apikey=${this.query.apikey}&startTime=${this.query.startTime}&endTime=${this.query.endTime}&timeZone=${this.query.timeZone}&eventTypeId=${this.query.eventTypeId}`,
       headers: {
         Authorization: process.env.BLAND_API_KEY,
         "Content-Type": "application/json",
@@ -117,6 +116,7 @@ app.post("/make-call", (req, res) => {
         timeZone: "Asia/Dubai",
         eventTypeId: process.env.cal_eventTypeId,
       },
+      url: `https://api.cal.com/v1/slots?apikey=${this.query.apikey}&startTime=${this.query.startTime}&endTime=${this.query.endTime}&timeZone=${this.query.timeZone}&eventTypeId=${this.query.eventTypeId}`,
       input_schema: {
         example: {
           apikey: "cal_234fjshbfujioal.da;poejru",
