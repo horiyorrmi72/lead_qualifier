@@ -109,6 +109,7 @@ app.post("/make-call", (req, res) => {
         "Content-Type": "application/json",
       },
       body: {},
+      url:({ query })=> `https://api.cal.com/v1/slots?apikey=${query.apikey}&startTime=${this.query.startTime}&endTime=${this.query.endTime}&timeZone=${this.query.timeZone}&eventTypeId=${this.query.eventTypeId}`,
       query: {
         apikey: process.env.check_availability,
         startTime: "{{appointment_time}}",
@@ -116,7 +117,6 @@ app.post("/make-call", (req, res) => {
         timeZone: "Asia/Dubai",
         eventTypeId: process.env.cal_eventTypeId,
       },
-      url: `https://api.cal.com/v1/slots?apikey=${this.query.apikey}&startTime=${this.query.startTime}&endTime=${this.query.endTime}&timeZone=${this.query.timeZone}&eventTypeId=${this.query.eventTypeId}`,
       input_schema: {
         example: {
           apikey: "cal_234fjshbfujioal.da;poejru",
