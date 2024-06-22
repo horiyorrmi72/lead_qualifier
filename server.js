@@ -51,7 +51,7 @@ app.post("/make-call", (req, res) => {
   Enthusiastically say you have the perfect team member to discuss further
   Confirm you can book them appointment with an agent to move the discussion forward
   Thank them for their time
-  Book the appointment
+  Book the appointment, in the absence of the time choosen by client choose the closet time to the time chosen example the client says tomorrow 10am and the available time does not include the 10:00:00:000Z but the closest available time is 10:30:00:000Z choose the time and notify the client of the available time.
   Politely wrap up the call
 
   EXAMPLE DIALOGUE:
@@ -126,41 +126,42 @@ app.post("/make-call", (req, res) => {
     },
     {
       name: "BookAppointment",
-    description: "Books an appointment for the customer",
-    speech: "Booking your appointment, a moment please.",
-    url: "https://4de2-102-89-32-122.ngrok-free.app/booker",
-    method: "POST",
-    headers: {
-      Authorization: process.env.BLAND_API_KEY,
-      "Content-Type": "application/json"
-    },
-    body: {
-      start: "{{input.start}}",
-      name: "{{input.name}}",
-      email: "{{input.email}}",
-      smsReminderNumber: "{{input.smsReminderNumber}}"
-    },
-    query: {},
-    input_schema: {
-      example: {
-        start: "2024-06-24T09:30:00.000Z",
-        name: "ola",
-        email: "ola@mail.com",
-        smsReminderNumber: "+2349095176621"
+      description: "Books an appointment for the customer",
+      speech: "Booking your appointment, a moment please.",
+      url: "https://lead-qualifier-i0r3.onrender.com/booker",
+      method: "POST",
+      headers: {
+        Authorization: process.env.BLAND_API_KEY,
+        "Content-Type": "application/json",
       },
-      properties: {
-        start: { type: "string", format: "date-time" },
-        name: { type: "string" },
-        email: { type: "string" },
-        smsReminderNumber: { type: "string" }
+      body: {
+        start: "{{input.start}}",
+        name: "{{input.name}}",
+        email: "{{input.email}}",
+        smsReminderNumber: "{{input.smsReminderNumber}}",
       },
-      description: "You will be having a meeting with an agent to give you more insight regarding your listing interest."
+      query: {},
+      input_schema: {
+        example: {
+          start: "2024-06-24T09:30:00.000Z",
+          name: "ola",
+          email: "ola@mail.com",
+          smsReminderNumber: "+2349095176621",
+        },
+        properties: {
+          start: { type: "string", format: "date-time" },
+          name: { type: "string" },
+          email: { type: "string" },
+          smsReminderNumber: { type: "string" },
+        },
+        description:
+          "You will be having a meeting with an agent to give you more insight regarding your listing interest.",
+      },
+      response: {
+        succesfully_booked_slot: "$.success",
+      },
+      timeout: 123,
     },
-    response: {
-      succesfully_booked_slot: "$.success"
-    },
-    timeout: 123
-  }
   ];
 
   // Create the parameters for the phone call. Ref: https://docs.bland.ai/api-reference/endpoint/call
@@ -262,5 +263,65 @@ app.post("/make-call", (req, res) => {
       });
     });
 });
+
+
+app.post("/booker", async (req, res) => {
+  const apiKey = process.env.Bland_cal_key;
+  const {
+    eventTypeId = 768395,
+    start,
+    name,
+    email,
+    smsReminderNumber,
+    timeZone = "Asia/Dubai",
+    language = "en",
+    metadata = {},
+  } = req.body;
+
+  // Validate the start field to ensure it's a proper ISO 8601 datetime string
+  const iso8601Regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
+  if (!iso8601Regex.test(start)) {
+    return res.status(400).json({
+      message:
+        "Invalid datetime format for 'start'. Expected ISO 8601 format (YYYY-MM-DDTHH:MM:SS.sssZ).",
+    });
+  }
+
+  const data = {
+    eventTypeId: parseInt(eventTypeId),
+    start,
+    responses: {
+      name,
+      email,
+      smsReminderNumber: smsReminderNumber,
+    },
+    timeZone: timeZone,
+    language,
+    metadata,
+  };
+
+  try {
+    const response = await axios.post(
+      `https://api.cal.com/v1/bookings?apiKey=${apiKey}`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    res.status(response.status).json(response.data);
+  } catch (error) {
+    console.error(
+      "Error booking appointment:",
+      error.response ? error.response.data : error.message
+    );
+    res.status(error.response ? error.response.status : 500).json({
+      message: "Failed to book appointment",
+      error: error.response ? error.response.data : error.message,
+    });
+  }
+});
+
 
 app.listen(PORT, () => console.log(`Server  running 🏃‍♂️ 😄 on port ${PORT}🔗`));
