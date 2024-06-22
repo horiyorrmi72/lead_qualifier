@@ -109,7 +109,7 @@ app.post("/make-call", (req, res) => {
         "Content-Type": "application/json",
       },
       body: {},
-      url:({ query })=> `https://api.cal.com/v1/slots?apikey=${query.apikey}&startTime=${this.query.startTime}&endTime=${this.query.endTime}&timeZone=${this.query.timeZone}&eventTypeId=${this.query.eventTypeId}`,
+      url:({ query })=> `https://api.cal.com/v1/slots?apikey=${query.apikey}&startTime=${query.startTime}&endTime=${query.endTime}&timeZone=${query.timeZone}&eventTypeId=${query.eventTypeId}`,
       query: {
         apikey: process.env.check_availability,
         startTime: "{{appointment_time}}",
