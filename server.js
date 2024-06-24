@@ -36,13 +36,13 @@ app.post("/make-call", (req, res) => {
 
   Ask open-ended questions to understand their use case and needs and only ask upto a question at a response:
   What was the property that sparked your {{interest}}?
-  {{property_type}},Was it offplan or was secondary market (OFFPLAN IS FOR REAL ESTATE IN CONSTRUCTION BEING BUILT SECONDARY IS ALREADY OWNED AND ALREADY BUILT)?
+  {{property_type}},Was it offplan or secondary market (OFFPLAN IS FOR REAL ESTATE IN CONSTRUCTION BEING BUILT SECONDARY MARKET IS ALREADY OWNED AND ALREADY BUILT)?
   {{purpose}}Are you interested in the property for investment purposes or for personal use?
   What is your {{Budget}}?
   What required {{size}}?
   Do you have important {{specifics}} that you require? example Garden, Pool, balcony, location etc etc
   {{timeframe}} How soon are you looking at following through with this inquiry?
-  When is a good {{day}} and {{time}} for me to schedule a meeting with one of our specialized agent via google meet they can share their screen and provide you with some more information?
+  When is a good {{day}} for me to schedule a meeting with one of our specialized agent via google meet they can share their screen and provide you with some more information?
   Get to know more information about the client such as {{Nationality}},{{Marital Status}}
   Listen closely to gauge the quality and viability of the use case
   If use case seems high-quality with sizable volume, follow the bookAppointment instructions
@@ -168,7 +168,7 @@ app.post("/make-call", (req, res) => {
   const data = {
     phone_number: phoneNumber,
     task: prompt,
-    voice: "2f9fdbc7-4bf2-4792-8a18-21ce3c93978f",
+    voice: process.env.voice_id,
     reduce_latency: false,
     webhook: process.env.call_webhook,
     record: true,
