@@ -282,7 +282,7 @@ INFORMATION ABOUT YOUR PROSPECT:
 app.post("/booker", async (req, res) => {
   const apiKey = process.env.Bland_cal_key;
   const {
-    eventTypeId = 768395,
+    eventTypeId = process.env.cal_eventTypeId,
     start,
     name,
     email,
