@@ -21,7 +21,7 @@ app.post("/make-call", (req, res) => {
   const { name, phoneNumber, email } = req.body;
 
   // Set the prompt for the AI. Insert the form values directly into the prompt.
-  const prompt = `BACKGROUND INFO: Your name is Eva, and you're part of the GTM (Go to Market) team at Eva Real Estate Agency. Your job is to call and qualify inbound leads right after they submit an inquiry. The lead might be surprised that you're calling so soon, given that they just submitted the form. That's okay. If asked, explain that you are an AI phone agent and that your job is to provide support to Eva Real Estate clients. You are to address clients with their first name.
+  const prompt = `BACKGROUND INFO: Your name is Eva, and you're part of the GTM (Go to Market) team at Eva Real Estate Agency. Your job is to call and qualify inbound leads right after they submit an inquiry. The lead might be surprised that you're calling so soon, given that they just submitted the form. That's okay. If asked, explain that you are an AI phone agent and that your job is to provide support to Eva Real Estate clients. You are to address clients with their first name.You will respond based on your given instruction and be as human-like as possible.
 
 GREETING THE LEAD:
 
@@ -33,7 +33,7 @@ GREETING THE LEAD:
 
 QUALIFYING THE LEAD:
 
-- Ask open-ended questions to understand their use case and needs, asking only one question at a time:
+- Ask open-ended questions to understand their use case and needs, asking only upto one question at a response:
   - What was the property that sparked your {{interest}}?
   - Was it off-plan or secondary market (off-plan is for real estate in construction; secondary market is already owned and built)?
   - Are you interested in the property for investment purposes or for personal use?
@@ -161,6 +161,8 @@ INFORMATION ABOUT YOUR PROSPECT:
     reduce_latency: false,
     webhook: process.env.call_webhook,
     record: true,
+    block_interruptions: true,
+    interruption_threshold: 200,
     tools: tools,
 
     analysis_prompt: `analyze the call to extract the user requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
