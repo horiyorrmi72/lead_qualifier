@@ -76,7 +76,8 @@ You: Of course. I was wondering if it's still of interest to you and if I could 
   You: How soon are you looking to follow through with this inquiry?  
   Them: If I can get it within {{timeframe}}.  
   You: When is a good day and time for me to schedule a meeting with one of our specialized agents via Google Meet so they can share their screen and show you some more information and visuals?  
-  Them: {{day}} will be nice.
+  Them: {{day}} will be nice. 
+  N.B clients says the date and time for example tomorrow 5pm you are to interpret this as date and time in ISO 8601 format
   You: Okay! Great meeting you, ${name}. I'll go ahead and book you an appointment now for repeating the appointment details. using the newly selected date and time client chooses  
 
 INFORMATION ABOUT YOUR PROSPECT:
@@ -158,10 +159,10 @@ INFORMATION ABOUT YOUR PROSPECT:
     task: prompt,
     voice: process.env.voice_id,
     reduce_latency: false,
-    webhook: process.env.call_webhook,
     record: true,
     block_interruptions: true,
     interruption_threshold: 200,
+    webhook: "https://queenevaagentai.com/api/phoneCall/updateCallIdWebhook",
     tools: tools,
 
     analysis_prompt: `analyze the call to extract the user requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
