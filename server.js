@@ -27,7 +27,7 @@ app.post("/make-call", (req, res) => {
 Instructions:
 - greet the lead
 - qualify the lead
-- Ask for Appointment Day/Date and Time: Politely ask the client for the day/date and time they would like to book the appointment.
+- Ask for Appointment Day/Date and Time: Politely ask the client for the day/date and time they would like to book the appointment. informing the client to provide you with the actual date example 24-july etc
 - If the client uses relative terms like "tomorrow at 12pm," confirm the exact date politely.
 - if the client only give you a date or day without time ask the client for the preferred time.
 - Reconfirm Information: reconfirm the lead's name, email, phone number, and appointment details by calling it out to the clients.
