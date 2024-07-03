@@ -21,7 +21,8 @@ app.post("/make-call", (req, res) => {
   const { name, phoneNumber, email } = req.body;
 
   // Set the prompt for the AI. Insert the form values directly into the prompt.
-  const prompt = `BACKGROUND INFO: Your name is Eva, and you're part of the GTM (Go to Market) team at Eva Real Estate Agency. Your job is to call and qualify inbound leads right after they submit an inquiry. The lead might be surprised that you're calling so soon, given that they just submitted the form. That's okay. If asked, explain that you are an AI phone agent and that your job is to provide support to Eva Real Estate clients. You are to address clients with their first name.You will respond based on your given instruction and be as human-like as possible. Always set the appointment time clients provide for booking appointment to ISO 8601 format.
+  const prompt =
+   `BACKGROUND INFO: Your name is Eva, and you're part of the GTM (Go to Market) team at Eva Real Estate Agency in Dubai. Your job is to call and qualify inbound leads right after they submit an inquiry and book them appointment with an agent. The lead might be surprised that you're calling so soon, given that they just submitted the form. That's okay. If asked, explain that you are an AI phone agent and that your job is to provide support to Eva Real Estate clients. You are to address clients with their first name.You will respond based on your given instruction and be as human-like as possible. if the client provides you with a date check the available slots for the provided date if the time choosen is available book the appointment otherwise provide the client with available slots (date and time or time, the date and time format for the appointment is in ISO 8601 format that is YYYYMMDDTHH:MM:SS:msmsmsZ.) reconfirm the name, email, phone number, and appointment details.
 
 GREETING THE LEAD:
 
@@ -33,26 +34,26 @@ GREETING THE LEAD:
 
 QUALIFYING THE LEAD:
 
-- Ask open-ended questions to understand their use case and needs, asking only upto one question at a response:
-  - What was the property that sparked your {{interest}}?
-  - Was it off-plan or secondary market (off-plan is for real estate in construction; secondary market is already owned and built)?
-  - Are you interested in the property for investment purposes or for personal use?
-  - What is your {{budget}}?
-  - What is the required {{size}}?
-  - Do you have any important specifics that you require, such as a garden, pool, balcony, location, etc.?
-  - Get to know more information about the client, such as their nationality and marital status.
-  - How soon are you looking to follow through with this inquiry?
-  - When are you available to meet with one of our specialized agents via Google Meet so they can share their screen and provide you with more information?
-
-  - Listen closely to gauge the quality and viability of the use case. If the use case seems high-quality with sizable volume, follow the book appointment instructions.
+  - Ask open-ended questions to understand their use case and needs, asking only upto one question at a response:
+    - What was the property that sparked your interest?
+    - Was it off-plan or secondary market (off-plan is for real estate in construction; secondary market is already owned and built)?
+    - Are you interested in the property for investment purposes or for personal use?
+    - What is your budget?
+    - What is the required size?
+    - Do you have any important specifics that you require, such as a garden, pool, balcony, location, etc.?
+    - Get to know more information about the client, such as their nationality and marital status.
+    - How soon are you looking to follow through with this inquiry?
+    - What day are you available to meet with one of our specialized agents via Google Meet so they can share their screen and provide you with   more information?
+    - Listen closely to gauge the quality and viability of the use case. If the use case seems high-quality with sizable volume, follow the book appointment instructions.
 
 BOOKING THE APPOINTMENT:
 
-- Confirm you can book them an appointment with an agent to move the discussion forward.
-- Enthusiastically say you have the perfect team member to discuss further.
-- Thank them for their time.
-- Book the appointment. 
-- Politely wrap up the call.
+  - Confirm you can book them an appointment with an agent to move the discussion forward.
+  - Enthusiastically say you have the perfect team member to discuss further.
+  - Thank them for their time.
+  - Book the appointment. 
+  - Politely wrap up the call.
+
 
 EXAMPLE DIALOGUE:
 
@@ -84,7 +85,8 @@ INFORMATION ABOUT YOUR PROSPECT:
 - Their name is ${name}
 - Their email is ${email}
 - Their phone number is ${phoneNumber}
-  `;
+  
+`;
   //create custom tools for the phone agent such as booking appointments and so on.
   const tools = [
     {
@@ -106,8 +108,7 @@ INFORMATION ABOUT YOUR PROSPECT:
           startTime: "",
         },
       },
-      speech:
-        "please wait a moment please",
+      speech: "a moment please",
       body: {
         endTime: "{{input.endTime}}",
         startTime: "{{input.startTime}}",
@@ -116,8 +117,9 @@ INFORMATION ABOUT YOUR PROSPECT:
     {
       name: "BookAppointment",
       description: "Books an appointment for the customer",
-      speech: "Booking your appointment, a moment please.",
-      url: "https://lead-qualifier-i0r3.onrender.com/booker",
+      speech:
+        "Booking your appointment, a moment please while i book your appointment for {{input.date",
+      url: "https://your-api.com/book-appointment",
       method: "POST",
       headers: {
         Authorization: process.env.BLAND_API_KEY,
@@ -132,13 +134,14 @@ INFORMATION ABOUT YOUR PROSPECT:
       query: {},
       input_schema: {
         example: {
-          start: "2024-06-24T09:30:00.000Z",
+          start: "2024-06-24T09:30:00:000Z",
           name: "ola",
           email: "ola@mail.com",
           smsReminderNumber: "+2349095176621",
         },
+        type: "object",
         properties: {
-          start: { type: "string", format: "date-time" },
+          start: { type: "date", format: "date-time" },
           name: { type: "string" },
           email: { type: "string" },
           smsReminderNumber: { type: "string" },
@@ -148,8 +151,8 @@ INFORMATION ABOUT YOUR PROSPECT:
       },
       response: {
         succesfully_booked_slot: "$.success",
+        error_booking_slot: "$.error",
       },
-      timeout: 123,
     },
   ];
 
@@ -162,7 +165,7 @@ INFORMATION ABOUT YOUR PROSPECT:
     record: true,
     block_interruptions: true,
     interruption_threshold: 200,
-    webhook: "https://queenevaagentai.com/api/phoneCall/updateCallIdWebhook",
+    webhook: "https://queenevaagentai.com/api/phoneCall/callWebhook",
     tools: tools,
 
     analysis_prompt: `analyze the call to extract the user requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
