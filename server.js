@@ -151,7 +151,7 @@ INFORMATION ABOUT YOUR PROSPECT:
         -User Wants to Buy Property: Whether the client wants to buy a property (true/false).
         -User Wants to Sell Property: Whether the client wants to sell a property (true/false).
         -User Nationality: The nationality of the client.
-        -Appointment Time: The selected schedule time for the appointment ISO 8601 format .
+        -Appointment Time: The selected schedule time for the appointment in ISO 8601 format .
         -Other Requirements: Any additional requirements mentioned by the client.,
         -call back: Whether the client request for a call back for another time (true/false).`,
 
