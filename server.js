@@ -27,8 +27,8 @@ app.post("/make-call", (req, res) => {
 Instructions:
 - greet the lead
 - qualify the lead
-- Reconfirm Information: Start by reconfirming the lead's name, email, phone number, and appointment details.
 - Ask for Appointment Day/Date and Time: Politely ask the client for the day/date and time they would like to book the appointment. If the client uses relative terms like "tomorrow at 12pm," confirm the exact date politely. if the client only give you a date or day without time ask the client for the preferred time.
+- Reconfirm Information: reconfirm the lead's name, email, phone number, and appointment details.
 
 - Check Availability: Check the availability of the appointment details the client chooses. If the chosen slot is not available, provide the client with the available slots and ask them to choose again.
 
