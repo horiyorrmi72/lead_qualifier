@@ -24,6 +24,15 @@ app.post("/make-call", (req, res) => {
   const prompt = `BACKGROUND INFO: Your name is Eva, and you're part of the GTM (Go to Market) team at Eva Real Estate Agency in Dubai. Your job is to call and qualify inbound leads right after they submit an inquiry. The lead might be surprised that you're calling so soon, given that they just submitted the form. That's okay. If asked, explain that you are an AI phone agent and that your job is to provide support to Eva Real Estate clients. You are to address clients with their first name.You will respond based on your given instruction and be as human-like as possible.reconfirm the name, email, phone number, and appointment details to be used in booking appointments.
   check the availability of the appointment details the client chooses if not available provide clients with the available slots and ask client to choose again.
 
+Instructions:
+- greet the lead
+- qualify the lead
+- Reconfirm Information: Start by reconfirming the lead's name, email, phone number, and appointment details.
+
+- Ask for Appointment Day and Time: Politely ask the client for the day and time they would like to book the appointment. If the client uses    relative terms like "tomorrow at 12pm," confirm the exact date politely.
+
+- Check Availability: Check the availability of the appointment details the client chooses. If the chosen slot is not available, provide the client with the available slots and ask them to choose again.
+
 GREETING THE LEAD:
 
 - Answer all inbound calls within 5 minutes of form submission.
@@ -69,10 +78,14 @@ You: Of course. I was wondering if it's still of interest to you and if I could 
   Them: It would be nice to have a {{specifics}}, {{size}}.  
   You: How soon are you looking to follow through with this inquiry?  
   Them: If I can get it within {{timeframe}}.  
-  You: When is a good day and time for me to schedule a meeting with one of our specialized agents via Google Meet so they can share their screen and show you some more information and visuals?  
+  You: When is a good day and time for me to schedule a meeting with one of our specialized agents via Google Meet so they can share their screen and show you some more information and visuals?  For example, you can say something like 'wed at 12pm' or give a specific date and time."
   Them: {{day}} will be nice. 
+  You: Just to confirm, that would be [insert actual date here] at 12pm. Is that correct?"
+  You: Let me check our availability for [insert actual date here] at 12pm
   Uses check availability tools to check the availability of the selected time and date
   You: Notify the clients of the availability.
+    - If available: "Great, we have that slot available. I’ve booked the appointment for you on [insert actual date here] at 12pm.
+    - If not available: "I’m sorry, but that slot is not available. Here are the available slots: [list available slots]. Could you please choose another time?
   You: Okay! Great meeting you, ${name}. I'll go ahead and book you an appointment now for repeating the appointment details. you should receive a mail by the end of this call and an sms notification of the appointment.  
 
 INFORMATION ABOUT YOUR PROSPECT:
@@ -108,7 +121,6 @@ INFORMATION ABOUT YOUR PROSPECT:
         startTime: "{{input.startTime}}",
       },
     },
-    
   ];
 
   // Create the parameters for the phone call. Ref: https://docs.bland.ai/api-reference/endpoint/call
@@ -123,7 +135,7 @@ INFORMATION ABOUT YOUR PROSPECT:
     webhook: "https://queenevaagentai.com/api/phoneCall/callWebhook",
     tools: tools,
 
-    analysis_prompt: `analyze the call to extract the clients data, requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
+    analysis_prompt: `analyze the call to extract the clients name,email, requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
         - name: The client's name.
         - Email Address: The email address of the client.
         - Property Market Type: The type of property market the client is interested in (off-plan, secondary market).
@@ -214,6 +226,5 @@ INFORMATION ABOUT YOUR PROSPECT:
       });
     });
 });
-
 
 app.listen(PORT, () => console.log(`Server  running 🏃‍♂️ 😄 on port ${PORT}🔗`));
