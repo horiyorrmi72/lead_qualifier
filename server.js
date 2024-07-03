@@ -21,8 +21,8 @@ app.post("/make-call", (req, res) => {
   const { name, phoneNumber, email } = req.body;
 
   // Set the prompt for the AI. Insert the form values directly into the prompt.
-  const prompt =
-   `BACKGROUND INFO: Your name is Eva, and you're part of the GTM (Go to Market) team at Eva Real Estate Agency in Dubai. Your job is to call and qualify inbound leads right after they submit an inquiry and book them appointment with an agent. The lead might be surprised that you're calling so soon, given that they just submitted the form. That's okay. If asked, explain that you are an AI phone agent and that your job is to provide support to Eva Real Estate clients. You are to address clients with their first name.You will respond based on your given instruction and be as human-like as possible. if the client provides you with a date check the available slots for the provided date if the time choosen is available book the appointment otherwise provide the client with available slots (date and time or time, the date and time format for the appointment is in ISO 8601 format that is YYYYMMDDTHH:MM:SS:msmsmsZ.) reconfirm the name, email, phone number, and appointment details.
+  const prompt = `BACKGROUND INFO: Your name is Eva, and you're part of the GTM (Go to Market) team at Eva Real Estate Agency in Dubai. Your job is to call and qualify inbound leads right after they submit an inquiry. The lead might be surprised that you're calling so soon, given that they just submitted the form. That's okay. If asked, explain that you are an AI phone agent and that your job is to provide support to Eva Real Estate clients. You are to address clients with their first name.You will respond based on your given instruction and be as human-like as possible.reconfirm the name, email, phone number, and appointment details to be used in booking appointments.
+  check the availability of the appointment details the client chooses if not available provide clients with the available slots and ask client to choose again.
 
 GREETING THE LEAD:
 
@@ -46,15 +46,6 @@ QUALIFYING THE LEAD:
     - What day are you available to meet with one of our specialized agents via Google Meet so they can share their screen and provide you with   more information?
     - Listen closely to gauge the quality and viability of the use case. If the use case seems high-quality with sizable volume, follow the book appointment instructions.
 
-BOOKING THE APPOINTMENT:
-
-  - Confirm you can book them an appointment with an agent to move the discussion forward.
-  - Enthusiastically say you have the perfect team member to discuss further.
-  - Thank them for their time.
-  - Book the appointment. 
-  - Politely wrap up the call.
-
-
 EXAMPLE DIALOGUE:
 
 You: Hey ${name}  
@@ -65,21 +56,24 @@ You: Of course. I was wondering if it's still of interest to you and if I could 
 - If no, the conversation will end immediately with a nice message.
 - If yes:
   You: Great! First of all, what was the property that sparked your interest?  
-  Them: The {{interest}} description.  
+  Them: The interest description.  
   You: That's awesome, it is a great choice! Was it off-plan or secondary market?  
-  Them: Oh, it was {{property_type}}.  
+  Them: Oh, it was property_type.  
   You: Are you interested in the property for investment purposes or for personal use?  
-  Them: For {{purpose}}.  
+  Them: For investment purpose.  
   You: What is your budget?  
-  Them: {{Budget}}  
-  You: What is your required size and do you have important specifics that you require? Garden, pool, balcony, location, etc.?  
+  Them: $15,000,000  
+  You: Do you have a required size?
+  Them: 40 acres
+  You: Do you have any important specifics that you require? Garden, pool, balcony, location, etc.?  
   Them: It would be nice to have a {{specifics}}, {{size}}.  
   You: How soon are you looking to follow through with this inquiry?  
   Them: If I can get it within {{timeframe}}.  
   You: When is a good day and time for me to schedule a meeting with one of our specialized agents via Google Meet so they can share their screen and show you some more information and visuals?  
   Them: {{day}} will be nice. 
-  N.B clients says the date and time for example tomorrow 5pm you are to interpret this as date and time in ISO 8601 format
-  You: Okay! Great meeting you, ${name}. I'll go ahead and book you an appointment now for repeating the appointment details. using the newly selected date and time client chooses  
+  Uses check availability tools to check the availability of the selected time and date
+  You: Notify the clients of the availability.
+  You: Okay! Great meeting you, ${name}. I'll go ahead and book you an appointment now for repeating the appointment details. you should receive a mail by the end of this call and an sms notification of the appointment.  
 
 INFORMATION ABOUT YOUR PROSPECT:
 - Their name is ${name}
@@ -100,8 +94,8 @@ INFORMATION ABOUT YOUR PROSPECT:
       query: {},
       input_schema: {
         example: {
-          endTime: "2024-06-24T16:30:00.000Z",
           startTime: "2024-06-24T09:30:00.000Z",
+          endTime: "2024-06-24T16:30:00.000Z",
         },
         properties: {
           endTime: "",
@@ -114,46 +108,7 @@ INFORMATION ABOUT YOUR PROSPECT:
         startTime: "{{input.startTime}}",
       },
     },
-    {
-      name: "BookAppointment",
-      description: "Books an appointment for the customer",
-      speech:
-        "Booking your appointment, a moment please while i book your appointment for {{input.date",
-      url: "https://your-api.com/book-appointment",
-      method: "POST",
-      headers: {
-        Authorization: process.env.BLAND_API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: {
-        start: "{{input.start}}",
-        name: "{{input.name}}",
-        email: "{{input.email}}",
-        smsReminderNumber: "{{input.smsReminderNumber}}",
-      },
-      query: {},
-      input_schema: {
-        example: {
-          start: "2024-06-24T09:30:00:000Z",
-          name: "ola",
-          email: "ola@mail.com",
-          smsReminderNumber: "+2349095176621",
-        },
-        type: "object",
-        properties: {
-          start: { type: "date", format: "date-time" },
-          name: { type: "string" },
-          email: { type: "string" },
-          smsReminderNumber: { type: "string" },
-        },
-        description:
-          "You will be having a meeting with an agent to give you more insight regarding your listing interest.",
-      },
-      response: {
-        succesfully_booked_slot: "$.success",
-        error_booking_slot: "$.error",
-      },
-    },
+    
   ];
 
   // Create the parameters for the phone call. Ref: https://docs.bland.ai/api-reference/endpoint/call
@@ -168,7 +123,7 @@ INFORMATION ABOUT YOUR PROSPECT:
     webhook: "https://queenevaagentai.com/api/phoneCall/callWebhook",
     tools: tools,
 
-    analysis_prompt: `analyze the call to extract the user requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
+    analysis_prompt: `analyze the call to extract the clients data, requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
         - name: The client's name.
         - Email Address: The email address of the client.
         - Property Market Type: The type of property market the client is interested in (off-plan, secondary market).
@@ -183,7 +138,7 @@ INFORMATION ABOUT YOUR PROSPECT:
         -User Wants to Buy Property: Whether the client wants to buy a property (true/false).
         -User Wants to Sell Property: Whether the client wants to sell a property (true/false).
         -User Nationality: The nationality of the client.
-        -Appointment Time: The scheduled time for the appointment, if any.
+        -Appointment Time: The selected schedule time for the appointment ISO 8601 format .
         -Other Requirements: Any additional requirements mentioned by the client.,
         -call back: Whether the client request for a call back for another time (true/false).`,
 
@@ -260,62 +215,5 @@ INFORMATION ABOUT YOUR PROSPECT:
     });
 });
 
-app.post("/booker", async (req, res) => {
-  const apiKey = process.env.Bland_cal_key;
-  const {
-    eventTypeId = process.env.cal_eventTypeId,
-    start,
-    name,
-    email,
-    smsReminderNumber,
-    timeZone = "Asia/Dubai",
-    language = "en",
-    metadata = {},
-  } = req.body;
-
-  // Validate the start field to ensure it's a proper ISO 8601 datetime string
-  const iso8601Regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
-  if (!iso8601Regex.test(start)) {
-    return res.status(400).json({
-      message:
-        "Invalid datetime format for 'start'. Expected ISO 8601 format (YYYY-MM-DDTHH:MM:SS.sssZ).",
-    });
-  }
-
-  const data = {
-    eventTypeId: parseInt(eventTypeId),
-    start,
-    responses: {
-      name,
-      email,
-      smsReminderNumber: smsReminderNumber,
-    },
-    timeZone: timeZone,
-    language,
-    metadata,
-  };
-
-  try {
-    const response = await axios.post(
-      `https://api.cal.com/v1/bookings?apiKey=${apiKey}`,
-      data,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    res.status(response.status).json(response.data);
-  } catch (error) {
-    console.error(
-      "Error booking appointment:",
-      error.response ? error.response.data : error.message
-    );
-    res.status(error.response ? error.response.status : 500).json({
-      message: "Failed to book appointment",
-      error: error.response ? error.response.data : error.message,
-    });
-  }
-});
 
 app.listen(PORT, () => console.log(`Server  running 🏃‍♂️ 😄 on port ${PORT}🔗`));
