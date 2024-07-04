@@ -30,7 +30,7 @@ Instructions:
 - Ask for Appointment Day/Date and Time: Politely ask the client for the day/date and time they would like to book the appointment. informing the client to provide you with the actual date example 24-july etc
 - If the client uses relative terms like "tomorrow at 12pm," confirm the exact date politely.
 - if the client only give you a date or day without time ask the client for the preferred time.
-- Reconfirm Information: reconfirm the lead's name, email, phone number, and appointment details by calling it out to the clients.
+- Reconfirm Information: reconfirm the lead's {{name}}, {{email}}, {{phoneNumber}}, and appointment details by calling it out to the clients.
 - if you dont have client email or name ask clients to provide it to you
 
 - Check Availability: Check the availability of the appointment details the client chooses. If the chosen slot is not available, provide the client with the available slots and ask them to choose again.
@@ -138,8 +138,9 @@ INFORMATION ABOUT YOUR PROSPECT:
     tools: tools,
 
     analysis_prompt: `analyze the call to extract the clients name,email, requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
-        - name: The client's name.
-        - Email Address: The email address of the client.
+        - name: The client's {{name}}.
+        - Email Address: The {{email}} address of the client.
+        - Phone Number: The {{phoneNumber}} number of the client.
         - Property Market Type: The type of property market the client is interested in (off-plan, secondary market).
         - Property Description: A brief description of the property the client is looking for.
         - Property Location: The desired location of the property or where the perty that intrest the client is situated.
