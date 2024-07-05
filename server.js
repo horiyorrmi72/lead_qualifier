@@ -32,8 +32,8 @@ Instructions:
 - if the client only give you a date or day without time ask the client for the preferred time.
 - Reconfirm Information: reconfirm the lead's {{name}}, {{email}}, {{phoneNumber}}, and appointment details by calling it out to the clients.
 - if you dont have client email or name ask clients to provide it to you
-
 - Check Availability: Check the availability of the appointment details the client chooses. If the chosen slot is not available, provide the client with the available slots and ask them to choose again.
+- Book the appointment using the provided details by making use of the Book Appointment tools.
 
 GREETING THE LEAD:
 
@@ -122,6 +122,48 @@ INFORMATION ABOUT YOUR PROSPECT:
         endTime: "{{input.endTime}}",
         startTime: "{{input.startTime}}",
       },
+    },
+    {
+      name: "BookAppointment",
+      description: "Books an appointment for the customer",
+      speech: "Booking your appointment, a moment please.",
+      url: "https://lead-qualifier-i0r3.onrender.com/booker",
+      speech:
+        "Booking your appointment, a moment please while i book your appointment for {{input.date}}",
+      method: "POST",
+      headers: {
+        Authorization: process.env.BLAND_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: {
+        start: "{{input.start}}",
+        name: "{{input.name}}",
+        email: "{{input.email}}",
+        smsReminderNumber: "{{input.smsReminderNumber}}",
+      },
+      query: {},
+      input_schema: {
+        example: {
+          start: "2024-06-24T09:30:00.000Z",
+          name: "ola",
+          email: "ola@mail.com",
+          smsReminderNumber: "+2349095176621",
+        },
+        type: "object",
+        properties: {
+          start: { type: "date", format: "date-time" },
+          name: { type: "string" },
+          email: { type: "string" },
+          smsReminderNumber: { type: "string" },
+        },
+        description:
+          "You will be having a meeting with an agent to give you more insight regarding your listing interest.",
+      },
+      response: {
+        succesfully_booked_slot: "$.success",
+        error_booking_slot: "$.error",
+      },
+      
     },
   ];
 
@@ -229,5 +271,64 @@ INFORMATION ABOUT YOUR PROSPECT:
       });
     });
 });
+
+// booking endpoint
+app.post("/booker", async (req, res) => {
+  const apiKey = process.env.Bland_cal_key;
+  const {
+    eventTypeId = process.env.cal_eventTypeId,
+    start,
+    name,
+    email,
+    smsReminderNumber,
+    timeZone = "Asia/Dubai",
+    language = "en",
+    metadata = {},
+    username = "cal.com/testevarealestatetest"
+  } = req.body;
+  // Validate the start field to ensure it's a proper ISO 8601 datetime string
+  const iso8601Regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
+  if (!iso8601Regex.test(start)) {
+    return res.status(400).json({
+      message:
+        "Invalid datetime format for 'start'. Expected ISO 8601 format (YYYY-MM-DDTHH:MM:SS.sssZ).",
+    });
+  }
+  const data = {
+    eventTypeId: parseInt(eventTypeId),
+    username,
+    start,
+    responses: {
+      name,
+      email,
+      smsReminderNumber: smsReminderNumber,
+    },
+    timeZone: timeZone,
+    language,
+    metadata,
+  };
+  try {
+    const response = await axios.post(
+      `https://api.cal.com/v1/bookings?apiKey=${apiKey}`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    res.status(response.status).json(response.data);
+  } catch (error) {
+    console.error(
+      "Error booking appointment:",
+      error.response ? error.response.data : error.message
+    );
+    res.status(error.response ? error.response.status : 500).json({
+      message: "Failed to book appointment",
+      error: error.response ? error.response.data : error.message,
+    });
+  }
+});
+
 
 app.listen(PORT, () => console.log(`Server  running 🏃‍♂️ 😄 on port ${PORT}🔗`));
