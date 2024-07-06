@@ -183,40 +183,40 @@ INFORMATION ABOUT YOUR PROSPECT:
         - name: The client's {{name}}.
         - Email Address: The {{email}} address of the client.
         - Phone Number: The {{phoneNumber}} number of the client.
-        - Property Market Type: The type of property market the client is interested in (off-plan, secondary market).
-        - Property Description: A brief description of the property the client is looking for.
-        - Property Location: The desired location of the property or where the perty that intrest the client is situated.
-        - Property Purpose: The purpose of the property (e.g., investment, personal use).
-        - Property Sizes: The preferred size(s) of the property.
-        - Budget: The client's budget for the property.
+        - Property Market Type: The type of {{propertyMarketType}} the client is interested in (off-plan, secondary market).
+        - Property Description: A brief {{propertyDescription}} the client is looking for.
+        - Property Location: The desired {{propertyLocation}} or where the property that intrest the client is situated.
+        - Property Purpose: The {{propertyPurpose}} of the property (e.g., investment, personal use).
+        - Property Sizes: The preferred size(s) of the property {{propertySizes}}.
+        - Budget: The client's {{budget}} for the property.
         -IsLead: Whether the client is a potential lead (true/false).
-        -Lead Quality Score: A numerical score representing the quality of the lead on a scale of 1 to 10.
-        -User Has Booked Appointment: Whether the client has booked an appointment (true/false).
-        -User Wants to Buy Property: Whether the client wants to buy a property (true/false).
-        -User Wants to Sell Property: Whether the client wants to sell a property (true/false).
-        -User Nationality: The nationality of the client.
-        -Appointment Time: The selected schedule time for the appointment in ISO 8601 format .
-        -Other Requirements: Any additional requirements mentioned by the client.,
-        -call back: Whether the client request for a call back for another time (true/false).`,
+        -Lead Quality Score: A numerical score {{leadScore}} representing the quality of the lead on a scale of 1 to 10.
+        -User Has Booked Appointment: Whether {{userHasBookedAppointment}} the client has booked an appointment (true/false).
+        -User Wants to Buy Property: Whether the client wants to buy a property {{userWantsToBuyProperty}}? (true/false).
+        -User Wants to Sell Property: Whether the client wants to sell a property {{userWantsToSellProperty}}? (true/false).
+        -User Nationality: The nationality of the client {{userNationality}}.
+        -Appointment Time: The selected schedule time for the appointment {{appointmentTime}} in ISO 8601 format .
+        -Other Requirements: Any additional requirements mentioned by the client {{otherRequirements}}.,
+        -call back: Whether the client request for a call back for another time {{callBack}} (true/false).`,
 
     analysis_schema: {
       name: String,
       email_address: String,
       property_market_type: String,
-      propertyDescription: String,
-      propertyLocation: String,
-      propertyPurpose: String,
-      propertySizes: String,
+      property_description: String,
+      property_location: String,
+      property_purpose: String,
+      property_sizes: String,
       budget: String,
-      isLead: Boolean,
-      leadQualityScore: Number,
-      userHasBookedAppointment: Boolean,
-      userWantsToBuyProperty: Boolean,
-      userWantsToSellProperty: Boolean,
-      userNationality: String,
-      appointmentTime: String,
-      otherRequirements: String,
-      callBack: Boolean,
+      is_lead: Boolean,
+      lead_quality_score: Number,
+      user_has_booked_appointment: Boolean,
+      user_wants_to_buy_property: Boolean,
+      user_wants_to_sell_property: Boolean,
+      user_nationality: String,
+      appointment_time: String,
+      other_requirements: String,
+      call_back: Boolean,
     },
   };
 
