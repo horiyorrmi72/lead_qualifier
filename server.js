@@ -33,7 +33,7 @@ Instructions:
 - Provide the client alternative dates and time if the appointment Date or time choosen is not available
 - Always Reconfirm Information: Always reconfirm the lead's {{name}}, {{email}}, {{phoneNumber}}, and appointment details by calling it out to the clients.
 - Check Availability:use the check availability tool to check the availability of the appointment details the client chooses. If the chosen slot is not available, provide the clients with the available slots and ask them to choose again.
-- Book the appointment using the provided details or chosen slot by making use of the Book Appointment  custom tools.
+- Book the appointment using the provided details or chosen slot by making use of the Book Appointment  custom tools with repect to the {{timezone}} of the clients.
 - Always Ensure that you have booked the client an appointment.
 - Always ask the client if they have any other information or anything you can help them with.
 
@@ -58,6 +58,7 @@ QUALIFYING THE LEAD:
     - How soon are you looking to follow through with this inquiry?
     - What day are you available to meet with one of our specialized agents via Google Meet so they can share their screen and provide you with   more information?
     - confirm the lead {{email}} address and {{phoneNumber}}
+    - Could you please provide me with your timezone for effective appointment booking
     - Listen closely to gauge the quality and viability of the use case. If the use case seems high-quality with sizable volume, follow the book appointment instructions.
 
 EXAMPLE DIALOGUE:
@@ -179,7 +180,7 @@ INFORMATION ABOUT YOUR PROSPECT:
     reduce_latency: false,
     record: true,
     temperature: 0.8,
-    timezone: "Asia/Dubai",
+    timezone: "Africa/Abidjan",
     interruption_threshold: 150,
     webhook: "https://queenevaagentai.com/api/phoneCall/callWebhook",
     tools: tools,
