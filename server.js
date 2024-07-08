@@ -35,7 +35,7 @@ Instructions:
 - if you dont have client email or name ask clients to provide it to you
 - Always Reconfirm Information: reconfirm the lead's {{name}}, {{email}}, {{phoneNumber}}, and appointment details by calling it out to the clients.
 - Check Availability: Check the availability of the appointment details the client chooses. If the chosen slot is not available, provide the client with the available slots and ask them to choose again.
-- Book the appointment using the provided details by making use of the Book Appointment tools.
+- Book the appointment using the provided details by making use of the Book Appointment  custom tools.
 - Always ask the client if they have any other information or anything you can help them with.
 
 GREETING THE LEAD:
@@ -103,7 +103,8 @@ INFORMATION ABOUT YOUR PROSPECT:
   const tools = [
     {
       name: "check availability",
-      description: "check selected date and time if available on my calendar",
+      description:
+        "This is a custom tool used to check selected date and time if available on my calendar. They want to book an appointment and they have provided BOTH the date and time. Make sure you get both date and time and do not move on until you have both. check the calendar if the provided date and time is available on my calendar",
       url: "https://ai-crm.fastgenapp.com/availability",
       method: "POST",
       headers: {
@@ -128,7 +129,8 @@ INFORMATION ABOUT YOUR PROSPECT:
     },
     {
       name: "BookAppointment",
-      description: "They want to book an appointment and they have provided BOTH the date and time. Make sure you get both date and time and do not move on until you have both.",
+      description:
+        "This is a custom tool for booking appointment on my calendar. They want to book an appointment and they have provided BOTH the date and time. Make sure you get both date and time and do not move on until you have both.",
       speech: "Booking your appointment, a moment please.",
       url: "https://lead-qualifier-i0r3.onrender.com/booker",
       speech:
@@ -166,7 +168,6 @@ INFORMATION ABOUT YOUR PROSPECT:
         succesfully_booked_slot: "$.success",
         error_booking_slot: "$.error",
       },
-      
     },
   ];
 
