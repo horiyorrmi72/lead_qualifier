@@ -31,6 +31,7 @@ Instructions:
 - Provide the client alternative dates and time if the appointment time choosen is not available
 - If the client uses relative terms like "tomorrow at 12pm," confirm the exact date politely.
 - if the client only give you a date or day without time ask the client for the preferred time.
+- Make sure you get both date and time and do not move on until you have both.
 - if you dont have client email or name ask clients to provide it to you
 - Always Reconfirm Information: reconfirm the lead's {{name}}, {{email}}, {{phoneNumber}}, and appointment details by calling it out to the clients.
 - Check Availability: Check the availability of the appointment details the client chooses. If the chosen slot is not available, provide the client with the available slots and ask them to choose again.
@@ -127,7 +128,7 @@ INFORMATION ABOUT YOUR PROSPECT:
     },
     {
       name: "BookAppointment",
-      description: "Books an appointment for the customer",
+      description: "They want to book an appointment and they have provided BOTH the date and time. Make sure you get both date and time and do not move on until you have both.",
       speech: "Booking your appointment, a moment please.",
       url: "https://lead-qualifier-i0r3.onrender.com/booker",
       speech:
