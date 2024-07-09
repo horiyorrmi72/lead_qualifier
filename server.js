@@ -2,7 +2,9 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const axios = require("axios");
+const OpenAI = require("openai");
 const cors = require("cors");
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Server setup
 app.use(cors());
@@ -104,16 +106,26 @@ INFORMATION ABOUT YOUR PROSPECT:
       name: "check availability",
       description:
         "This is a custom tool used to check selected date and time if available on my calendar. They want to book an appointment and they have provided BOTH the date and time. Make sure you get both date and time and do not move on until you have both. check the calendar if the provided date and time is available on my calendar",
-      url: "https://ai-crm.fastgenapp.com/availability",
-      method: "POST",
+      url: "https://lead-qualifier-i0r3.onrender.com/get-available-slots",
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-      query: {},
+      type: "object",
+      query: {
+        apiKey: process.env.Bland_cal_key,
+        endTime: "{{input.endTime}}",
+        startTime: "{{input.startTime}}",
+        eventTypeId: process.env.cal_eventTypeId,
+        timeZone: Asia/Dubai,
+      },
       input_schema: {
         example: {
+          apiKey: "cal_xxxxxxxxxxxxxxxxx",
+          eventTypeId: 1233444,
           startTime: "2024-06-24T09:30:00.000Z",
           endTime: "2024-06-24T16:30:00.000Z",
+          timeZone: "Asia/Dubai",
         },
         properties: {
           endTime: "",
@@ -121,9 +133,10 @@ INFORMATION ABOUT YOUR PROSPECT:
         },
       },
       speech: "a moment please",
-      body: {
-        endTime: "{{input.endTime}}",
-        startTime: "{{input.startTime}}",
+      body: {},
+      response: {
+        succesfully_booked_slot: "$.success",
+        error_booking_slot: "$.error",
       },
     },
     {
@@ -177,7 +190,7 @@ INFORMATION ABOUT YOUR PROSPECT:
     voice: process.env.voice_id,
     reduce_latency: false,
     record: true,
-    temperature: 0.8,
+    temperature: 0.5,
     timezone: "Africa/Abidjan",
     interruption_threshold: 150,
     webhook: "https://queenevaagentai.com/api/phoneCall/callWebhook",
@@ -276,7 +289,80 @@ INFORMATION ABOUT YOUR PROSPECT:
     });
 });
 
-// booking endpoint
+
+
+async function parseDateQuery(query) {
+  try {
+    const completion = await openai.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: `Convert the following date query into an ISO 8601 format (yyyy-mm-ddThh:mm:ss.sssZ): ${query}`,
+        },
+      ],
+      model: "gpt-3.5-turbo",
+      max_tokens: 50,
+      temperature: 0.2,
+    });
+
+    const formattedDate = completion.choices[0].message.content.trim();
+    return formattedDate;
+  } catch (error) {
+    console.error("Error parsing date query:", error);
+    return null;
+  }
+}
+app.get("/get-available-slots", async (req, res) => {
+  const {
+    eventTypeId,
+    startTime: naturalLanguageStartQuery,
+    endTime: naturalLanguageEndQuery,
+    timeZone = Asia / Dubai,
+    apiKey = process.env.Bland_cal_key,
+  } = req.query;
+
+  if (
+    !eventTypeId ||
+    !naturalLanguageStartQuery ||
+    !naturalLanguageEndQuery ||
+    !timeZone ||
+    !apiKey
+  ) {
+    return res.status(400).json({ error: "Missing required parameters" });
+  }
+
+  const startTime = await parseDateQuery(naturalLanguageStartQuery);
+  const endTime = await parseDateQuery(naturalLanguageEndQuery);
+
+  if (!startTime || !endTime) {
+    return res.status(500).json({ error: "Failed to parse date queries" });
+  }
+
+  const params = {
+    eventTypeId,
+    startTime,
+    endTime,
+    timeZone,
+    apiKey,
+  };
+
+  // cal endpoint for fetching available slots
+  const url = "https://api.cal.com/v1/slots";
+  try {
+    const response = await axios.get(url, { params });
+    if (response.status === 200) {
+      // console.log(response);
+      res.json(response.data);
+    } else {
+      res.status(response.status).json({ error: response.statusText });
+    }
+  } catch (error) {
+    console.error("Error fetching available slots:", error);
+    res.status(500).json({ error: "Error fetching available slots" });
+  }
+});
+
+
 app.post("/booker", async (req, res) => {
   const apiKey = process.env.Bland_cal_key;
   const {
@@ -288,8 +374,8 @@ app.post("/booker", async (req, res) => {
     timeZone = "Asia/Dubai",
     language = "en",
     metadata = {},
-    username = "cal.com/testevarealestatetest"
   } = req.body;
+
   // Validate the start field to ensure it's a proper ISO 8601 datetime string
   const iso8601Regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
   if (!iso8601Regex.test(start)) {
@@ -298,9 +384,9 @@ app.post("/booker", async (req, res) => {
         "Invalid datetime format for 'start'. Expected ISO 8601 format (YYYY-MM-DDTHH:MM:SS.sssZ).",
     });
   }
+
   const data = {
     eventTypeId: parseInt(eventTypeId),
-    username,
     start,
     responses: {
       name,
@@ -311,6 +397,7 @@ app.post("/booker", async (req, res) => {
     language,
     metadata,
   };
+
   try {
     const response = await axios.post(
       `https://api.cal.com/v1/bookings?apiKey=${apiKey}`,
@@ -333,6 +420,13 @@ app.post("/booker", async (req, res) => {
     });
   }
 });
+
+const parseToISO8601 = (dateStr) => {
+  const ordinalSuffixRegex = /(\d+)(st|nd|rd|th)/;
+  const cleanedDateString = dateStr.replace(ordinalSuffixRegex, "$1");
+  const parsedDate = parse(cleanedDateString, "EEE d at ha", new Date());
+  return format(parsedDate, "yyyy-MM-dd'T'HH:mm:ssXXX");
+};
 
 
 app.listen(PORT, () => console.log(`Server  running 🏃‍♂️ 😄 on port ${PORT}🔗`));
