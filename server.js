@@ -117,7 +117,7 @@ INFORMATION ABOUT YOUR PROSPECT:
         endTime: "{{input.endTime}}",
         startTime: "{{input.startTime}}",
         eventTypeId: process.env.cal_eventTypeId,
-        timeZone: Asia/Dubai,
+        timeZone: "Asia/Dubai",
       },
       input_schema: {
         example: {
