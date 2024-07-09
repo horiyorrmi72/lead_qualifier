@@ -105,14 +105,20 @@ INFORMATION ABOUT YOUR PROSPECT:
     {
       name: "check availability",
       description:
-        "This is a custom tool used to check selected date and time if available on my calendar. They want to book an appointment and they have provided BOTH the date and time. Make sure you get both date and time and do not move on until you have both. check the calendar if the provided date and time is available on my calendar",
-      url: `https://lead-qualifier-i0r3.onrender.com/get-available-slots?apiKey=${process.env.Bland_cal_key}&startTime=${startTime}&endTime=${endTime}&eventTypeId=896227&timeZone=Asia/Dubai`,
+        "This is a custom tool used to check selected date and time if available on my calendar. They want to book an appointment and they have provided BOTH the date and time. Make sure you get both date and time and do not move on until you have both. Check the calendar if the provided date and time is available on my calendar",
+      url: "https://lead-qualifier-i0r3.onrender.com/get-available-slots",
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
       type: "object",
-      query: {},
+      query: {
+        apiKey: process.env.Bland_cal_key,
+        eventTypeId: process.env.cal_eventTypeId,,
+        startTime: "{{input.startTime}}",
+        endTime: "{{input.endTime}}",
+        timeZone: "Asia/Dubai",
+      },
       input_schema: {
         example: {
           apiKey: "cal_xxxxxxxxxxxxxxxxx",
@@ -122,12 +128,13 @@ INFORMATION ABOUT YOUR PROSPECT:
           timeZone: "Asia/Dubai",
         },
         properties: {
-          endTime: "",
-          startTime: "",
+          apiKey: { type: "string" },
+          eventTypeId: { type: "integer" },
+          startTime: { type: "string", format: "date-time" },
+          endTime: { type: "string", format: "date-time" },
         },
       },
       speech: "a moment please",
-      body: {},
       response: {
         succesfully_booked_slot: "$.success",
         error_booking_slot: "$.error",
@@ -283,8 +290,6 @@ INFORMATION ABOUT YOUR PROSPECT:
     });
 });
 
-
-
 async function parseDateQuery(query) {
   try {
     const completion = await openai.chat.completions.create({
@@ -306,56 +311,61 @@ async function parseDateQuery(query) {
     return null;
   }
 }
-app.get("/get-available-slots", async (req, res) => {
-  const {
-    eventTypeId,
-    startTime: naturalLanguageStartQuery,
-    endTime: naturalLanguageEndQuery,
-    timeZone = Asia / Dubai,
-    apiKey = process.env.Bland_cal_key,
-  } = req.query;
-
-  if (
-    !eventTypeId ||
-    !naturalLanguageStartQuery ||
-    !naturalLanguageEndQuery ||
-    !timeZone ||
-    !apiKey
-  ) {
+app.post("/check-availability", (req, res) => {
+  const { startTime, endTime } = req.body;
+  if (!startTime || !endTime) {
     return res.status(400).json({ error: "Missing required parameters" });
   }
+  app.get("/get-available-slots", async (req, res) => {
+    const {
+      eventTypeId,
+      startTime: naturalLanguageStartQuery,
+      endTime: naturalLanguageEndQuery,
+      timeZone = "Asia/Dubai",
+      apiKey = process.env.Bland_cal_key,
+    } = req.query;
 
-  const startTime = await parseDateQuery(naturalLanguageStartQuery);
-  const endTime = await parseDateQuery(naturalLanguageEndQuery);
-
-  if (!startTime || !endTime) {
-    return res.status(500).json({ error: "Failed to parse date queries" });
-  }
-
-  const params = {
-    eventTypeId,
-    startTime,
-    endTime,
-    timeZone,
-    apiKey,
-  };
-
-  // cal endpoint for fetching available slots
-  const url = "https://api.cal.com/v1/slots";
-  try {
-    const response = await axios.get(url, { params });
-    if (response.status === 200) {
-      // console.log(response);
-      res.json(response.data);
-    } else {
-      res.status(response.status).json({ error: response.statusText });
+    if (
+      !eventTypeId ||
+      !naturalLanguageStartQuery ||
+      !naturalLanguageEndQuery ||
+      !timeZone ||
+      !apiKey
+    ) {
+      return res.status(400).json({ error: "Missing required parameters" });
     }
-  } catch (error) {
-    console.error("Error fetching available slots:", error);
-    res.status(500).json({ error: "Error fetching available slots" });
-  }
-});
 
+    const startTime = await parseDateQuery(naturalLanguageStartQuery);
+    const endTime = await parseDateQuery(naturalLanguageEndQuery);
+
+    if (!startTime || !endTime) {
+      return res.status(500).json({ error: "Failed to parse date queries" });
+    }
+
+    const params = {
+      eventTypeId,
+      startTime,
+      endTime,
+      timeZone,
+      apiKey,
+    };
+
+    // cal endpoint for fetching available slots
+    const url = "https://api.cal.com/v1/slots";
+    try {
+      const response = await axios.get(url, { params });
+      if (response.status === 200) {
+        // console.log(response);
+        res.json(response.data);
+      } else {
+        res.status(response.status).json({ error: response.statusText });
+      }
+    } catch (error) {
+      console.error("Error fetching available slots:", error);
+      res.status(500).json({ error: "Error fetching available slots" });
+    }
+  });
+});
 
 app.post("/booker", async (req, res) => {
   const apiKey = process.env.Bland_cal_key;
@@ -421,6 +431,5 @@ const parseToISO8601 = (dateStr) => {
   const parsedDate = parse(cleanedDateString, "EEE d at ha", new Date());
   return format(parsedDate, "yyyy-MM-dd'T'HH:mm:ssXXX");
 };
-
 
 app.listen(PORT, () => console.log(`Server  running 🏃‍♂️ 😄 on port ${PORT}🔗`));
