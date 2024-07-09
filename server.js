@@ -114,7 +114,7 @@ INFORMATION ABOUT YOUR PROSPECT:
       type: "object",
       query: {
         apiKey: process.env.Bland_cal_key,
-        eventTypeId: process.env.cal_eventTypeId,,
+        eventTypeId: process.env.cal_eventTypeId,
         startTime: "{{input.startTime}}",
         endTime: "{{input.endTime}}",
         timeZone: "Asia/Dubai",
@@ -250,7 +250,8 @@ INFORMATION ABOUT YOUR PROSPECT:
       const { status, call_id } = response.data;
       console.log(response);
 
-      if (status) {
+      if (status)
+      {
         const webookUrl = process.env.call_id_webhook_url;
         const webhookdata = {
           phoneNumber,
@@ -272,7 +273,8 @@ INFORMATION ABOUT YOUR PROSPECT:
           realStatus: status,
           call_id,
         });
-      } else {
+      } else
+      {
         console.log(JSON.stringify(res));
         res.status(400).send({
           message: "Error 🔥 dispatching phone call",
@@ -311,12 +313,8 @@ async function parseDateQuery(query) {
     return null;
   }
 }
-app.post("/check-availability", (req, res) => {
-  const { startTime, endTime } = req.body;
-  if (!startTime || !endTime) {
-    return res.status(400).json({ error: "Missing required parameters" });
-  }
-  app.get("/get-available-slots", async (req, res) => {
+  
+app.get("/get-available-slots", async (req, res) => {
     const {
       eventTypeId,
       startTime: naturalLanguageStartQuery,
@@ -364,7 +362,6 @@ app.post("/check-availability", (req, res) => {
       console.error("Error fetching available slots:", error);
       res.status(500).json({ error: "Error fetching available slots" });
     }
-  });
 });
 
 app.post("/booker", async (req, res) => {
