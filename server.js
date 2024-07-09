@@ -106,7 +106,7 @@ INFORMATION ABOUT YOUR PROSPECT:
       name: "check availability",
       description:
         "This is a custom tool used to check selected date and time if available on my calendar. They want to book an appointment and they have provided BOTH the date and time. Make sure you get both date and time and do not move on until you have both. check the calendar if the provided date and time is available on my calendar",
-      url: "https://lead-qualifier-i0r3.onrender.com/get-available-slots",
+      url: `https://lead-qualifier-i0r3.onrender.com/get-available-slots?apiKey=${Bland_cal_key}&startTime=${input.startTime}&endTime=${input.endTime}&eventTypeId=896227&timeZone=Asia/Dubai`,
       method: "GET",
       headers: {
         "Content-Type": "application/json",
