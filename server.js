@@ -112,13 +112,7 @@ INFORMATION ABOUT YOUR PROSPECT:
         "Content-Type": "application/json",
       },
       type: "object",
-      query: {
-        apiKey: process.env.Bland_cal_key,
-        endTime: "{{input.endTime}}",
-        startTime: "{{input.startTime}}",
-        eventTypeId: process.env.cal_eventTypeId,
-        timeZone: "Asia/Dubai",
-      },
+      query: {},
       input_schema: {
         example: {
           apiKey: "cal_xxxxxxxxxxxxxxxxx",
