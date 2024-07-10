@@ -147,7 +147,7 @@ INFORMATION ABOUT YOUR PROSPECT:
       speech: "Booking your appointment, a moment please.",
       url: "https://lead-qualifier-i0r3.onrender.com/booker",
       speech:
-        "Booking your appointment, a moment please while i book your appointment for {{input.date}}",
+        "Booking your appointment, a moment please while i book your appointment for [insert actual date here]",
       method: "POST",
       headers: {
         Authorization: process.env.BLAND_API_KEY,
@@ -191,12 +191,6 @@ INFORMATION ABOUT YOUR PROSPECT:
     voice: process.env.voice_id,
     reduce_latency: false,
     record: true,
-    temperature: 0.5,
-    timezone: "Africa/Abidjan",
-    interruption_threshold: 150,
-    webhook: "https://queenevaagentai.com/api/phoneCall/callWebhook",
-    tools: tools,
-
     analysis_prompt: `analyze the call to extract the clients name,email, requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
         - name: The client's {{name}}.
         - Email Address: The {{email}} address of the client.
@@ -207,15 +201,15 @@ INFORMATION ABOUT YOUR PROSPECT:
         - Property Purpose: The {{propertyPurpose}} of the property (e.g., investment, personal use).
         - Property Sizes: The preferred size(s) of the property {{propertySizes}}.
         - Budget: The client's {{budget}} for the property.
-        -IsLead: Whether the client is a potential lead {{isLead}}(true/false).
-        -Lead Quality Score: A numerical score {{leadScore}} representing the quality of the lead on a scale of 1 to 10.
-        -User Has Booked Appointment: Whether {{userHasBookedAppointment}} the client has booked an appointment (true/false).
-        -User Wants to Buy Property: Whether the client wants to buy a property {{userWantsToBuyProperty}}? (true/false).
-        -User Wants to Sell Property: Whether the client wants to sell a property {{userWantsToSellProperty}}? (true/false).
-        -User Nationality: The nationality of the client {{userNationality}}.
-        -Appointment Time: The selected schedule time for the appointment {{appointmentTime}} in ISO 8601 format .
-        -Other Requirements: Any additional requirements mentioned by the client {{otherRequirements}}.,
-        -call back: Whether the client request for a call back for another time {{callBack}} (true/false).`,
+        - isLead: Whether the client is a potential lead {{isLead}}(true/false).
+        - Lead Quality Score: A numerical score {{leadScore}} representing the quality of the lead on a scale of 1 to 10.
+        - User Has Booked Appointment: Whether {{userHasBookedAppointment}} the client has booked an appointment (true/false).
+        - User Wants to Buy Property: Whether the client wants to buy a property {{userWantsToBuyProperty}}? (true/false).
+        - User Wants to Sell Property: Whether the client wants to sell a property {{userWantsToSellProperty}}? (true/false).
+        - User Nationality: The nationality of the client {{userNationality}}.
+        - Appointment Time: The selected schedule time for the appointment {{appointmentTime}} in ISO 8601 format .
+        - Other Requirements: Any additional requirements mentioned by the client {{otherRequirements}}.,
+        - call back: Whether the client request for a call back for another time {{callBack}} (true/false).`,
 
     analysis_schema: {
       name: String,
@@ -236,6 +230,11 @@ INFORMATION ABOUT YOUR PROSPECT:
       other_requirements: String,
       call_back: Boolean,
     },
+    temperature: 0.5,
+    timezone: "Africa/Abidjan",
+    interruption_threshold: 100,
+    tools: tools,
+    webhook: "https://queenevaagentai.com/api/phoneCall/callWebhook",
   };
 
   // Dispatch the phone call
@@ -368,7 +367,7 @@ app.post("/booker", async (req, res) => {
   const apiKey = process.env.Bland_cal_key;
   const {
     eventTypeId = process.env.cal_eventTypeId,
-    start,
+    start: naturalLanguageStartQuery,
     name,
     email,
     smsReminderNumber,
@@ -377,9 +376,12 @@ app.post("/booker", async (req, res) => {
     metadata = {},
   } = req.body;
 
-  // Validate the start field to ensure it's a proper ISO 8601 datetime string
+  // Using GPT to parse the natural language date query
+  const start = await parseDateQuery(naturalLanguageStartQuery);
+
+  // Validating the parsed start field to ensure it's a proper ISO 8601 datetime string
   const iso8601Regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
-  if (!iso8601Regex.test(start)) {
+  if (!start || !iso8601Regex.test(start)) {
     return res.status(400).json({
       message:
         "Invalid datetime format for 'start'. Expected ISO 8601 format (YYYY-MM-DDTHH:MM:SS.sssZ).",
@@ -392,9 +394,9 @@ app.post("/booker", async (req, res) => {
     responses: {
       name,
       email,
-      smsReminderNumber: smsReminderNumber,
+      smsReminderNumber,
     },
-    timeZone: timeZone,
+    timeZone,
     language,
     metadata,
   };
@@ -421,12 +423,5 @@ app.post("/booker", async (req, res) => {
     });
   }
 });
-
-const parseToISO8601 = (dateStr) => {
-  const ordinalSuffixRegex = /(\d+)(st|nd|rd|th)/;
-  const cleanedDateString = dateStr.replace(ordinalSuffixRegex, "$1");
-  const parsedDate = parse(cleanedDateString, "EEE d at ha", new Date());
-  return format(parsedDate, "yyyy-MM-dd'T'HH:mm:ssXXX");
-};
 
 app.listen(PORT, () => console.log(`Server  running 🏃‍♂️ 😄 on port ${PORT}🔗`));
