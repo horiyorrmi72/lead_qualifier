@@ -82,7 +82,9 @@ You: Of course. I was wondering if it's still of interest to you and if I could 
   You: Do you have a required size?
   Them:  [Size, e.g., 40 acres]
   You: Any specific requirements like a garden, pool, balcony, location, etc.?
-  Them: [Specifics] 
+  Them: [Specifics]
+  You: What is your nationality and marital status?
+  Them: [Nationality and marital status]
   You: How soon are you looking to proceed?
   Them:  [Timeframe]
   You: When is a good day and time for me to schedule a meeting with our agent via Google Meet for more details? For example, "Wednesday at 12pm" or a specific date and time.
@@ -91,8 +93,14 @@ You: Of course. I was wondering if it's still of interest to you and if I could 
   You: Let me check our availability for [insert actual date here] at 12pm.
   (Use check availability tools)
   You: Notify the client of the availability.
-    - If available: Great, we have that slot available. I’ve booked the appointment for you on [insert actual date here] at 12pm.
+    - If available: Great, we have that slot available. I’ve booked the appointment for you on [insert actual date here] at [insert actual time here].
     - If not available: I’m sorry, but that slot is not available. Here are the available slots: [list available slots]. Could you please choose another time?
+  You: Can I also confirm your email and phone number for the appointment details?
+  Them : yes, you can
+  You: call out [name,email and phone number] of the client
+  Them : yes, thats correct
+  You: And what is your timezone for the appointment booking?
+  Them: [Timezone]
   You: Okay! Great meeting you, ${name}. I'll go ahead and book the appointment now. You should receive a confirmation email and SMS notification by the end of this call.
 
 INFORMATION ABOUT YOUR PROSPECT:
@@ -147,7 +155,7 @@ INFORMATION ABOUT YOUR PROSPECT:
       speech: "Booking your appointment, a moment please.",
       url: "https://lead-qualifier-i0r3.onrender.com/booker",
       speech:
-        "Booking your appointment, a moment please while i book your appointment for [insert actual date here]",
+        "Booking your appointment, a moment please while i book your appointment ",
       method: "POST",
       headers: {
         Authorization: process.env.BLAND_API_KEY,
