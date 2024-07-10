@@ -199,6 +199,7 @@ INFORMATION ABOUT YOUR PROSPECT:
     voice: process.env.voice_id,
     reduce_latency: false,
     record: true,
+    summary_prompt: `generate the call summary to capture the client's {{name}}, {{email}},{{phoneNumber}},{{propertyMarketType}},{{propertyLocation}},{{propertyDescription}},{{propertyPurpose}},{{propertySizes}},{{budget}},{{leadScore}}, {{userNationality}}, if the client {{userHasBookedAppointment}},{{userWantsToBuyProperty}},{{userWantsToSellProperty}},{{appointmentTime}},{{otherRequirements}},{{callBack}} `,
     analysis_prompt: `analyze the call to extract the clients name,email, requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
         - name: The client's {{name}}.
         - Email Address: The {{email}} address of the client.
