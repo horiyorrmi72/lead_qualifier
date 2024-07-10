@@ -239,9 +239,9 @@ INFORMATION ABOUT YOUR PROSPECT:
       other_requirements: String,
       call_back: Boolean,
     },
-    temperature: 0.5,
+    temperature: 0.3,
     timezone: "Africa/Abidjan",
-    interruption_threshold: 100,
+    interruption_threshold: 150,
     tools: tools,
     webhook: "https://queenevaagentai.com/api/phoneCall/callWebhook",
   };
