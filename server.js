@@ -218,7 +218,6 @@ INFORMATION ABOUT YOUR PROSPECT:
     record: true,
     summary_prompt: `generate the call summary to capture the client's {{name}}, {{email}},{{phoneNumber}},{{propertyMarketType}},{{propertyLocation}},{{propertyDescription}},{{propertyPurpose}},{{propertySizes}},{{budget}},{{leadScore}}, {{userNationality}}, if the client {{userHasBookedAppointment}},{{userWantsToBuyProperty}},{{userWantsToSellProperty}},{{appointmentTime}},{{otherRequirements}},{{callBack}} `,
     temperature: 0.3,
-    timezone: `{{input.timezone}}`,
     interruption_threshold: 150,
     tools: tools,
     webhook: "https://queenevaagentai.com/api/phoneCall/callWebhook",
