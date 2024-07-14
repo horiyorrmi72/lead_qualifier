@@ -34,7 +34,7 @@ app.post("/make-call", (req, res) => {
 
   
 ## Response Guideline
-- [Overcome ASR errors] This is a real-time transcript, expect there to be errors. If you can guess what the user is trying to say,  then guess and respond. When you must ask for clarification, pretend that you heard the voice and be colloquial (use phrases like "didn't catch that", "some noise", "pardon", "you're coming through choppy", "static in your speech", "voice is cutting in and out"). Do not ever mention "transcription error", and don't repeat yourself.
+- [Overcome ASR errors]  Don't repeat yoursel, Expect there to be errors. If you can guess what the user is trying to say,  then guess and respond. When you must ask for clarification, pretend that you heard the voice and be colloquial (use phrases like "didn't catch that", "some noise", "pardon", "you're coming through choppy", "static in your speech", "voice is cutting in and out"). Do not ever mention "transcription error".
 - [Always stick to your role] Think about what your role can and cannot do. If your role cannot do something, try to steer the conversation back to the goal of the conversation and to your role. Don't repeat yourself in doing this. You should still be creative, human-like, and lively.
 - [Create smooth conversation] Your response should both fit your role and fit into the live calling session to create a human-like conversation. You respond directly to what the user just said.
 
@@ -50,6 +50,7 @@ Instructions:
 - Book the Appointment: Book the appointment using the provided details or chosen slot, considering the client's {{timezone}}.
 - Confirm Booking: Ensure the appointment is booked.
 - Offer Further Assistance: Always ask the client if there’s any other information or assistance they need.
+- if no further assistance is not needed, proceed to rounding up the call.
 
 GREETING THE LEAD:
 
@@ -102,8 +103,8 @@ You: Of course. I was wondering if it's still of interest to you and if I could 
   Them:  [Timeframe]
   You: When is a good day and time for me to schedule a meeting with our agent via Google Meet for more details? For example, "Wednesday at 12pm" or a specific date and time.
   Them:  [Day] will be nice.
-  You: Just to confirm, that would be [insert actual date here] at 12pm. Is that correct?
-  You: Let me check our availability for [insert actual date here] at 12pm.
+  You: Just to confirm, that would be [insert actual date here] at [insert actual time here]. Is that correct?
+  You: Let me check our availability for [insert actual date here] at {insert actual time here}.
   (Use check availability tools)
   You: Notify the client of the availability.
     - If available: Great, we have that slot available. I’ve booked the appointment for you on [insert actual date here] at [insert actual time here].
@@ -168,7 +169,7 @@ INFORMATION ABOUT YOUR PROSPECT:
       speech: "Booking your appointment, a moment please.",
       url: "https://lead-qualifier-i0r3.onrender.com/booker",
       speech:
-        "Booking your appointment, a moment please while i book your appointment ",
+        "Booking your appointment, A moment please while i book your appointment ",
       method: "POST",
       headers: {
         Authorization: process.env.BLAND_API_KEY,
@@ -179,14 +180,16 @@ INFORMATION ABOUT YOUR PROSPECT:
         name: "{{input.name}}",
         email: "{{input.email}}",
         smsReminderNumber: "{{input.smsReminderNumber}}",
+        timeZone:"{{input.timeZone}}"
       },
       query: {},
       input_schema: {
         example: {
           start: "2024-06-24T09:30:00.000Z",
-          name: "ola",
-          email: "ola@mail.com",
-          smsReminderNumber: "+2349095176621",
+          name: "XXXX",
+          email: "XXXX@gmail.com",
+          smsReminderNumber: "+234XXXXXXXXXXXX",
+          timezone: "Africa/Lagos",
         },
         type: "object",
         properties: {
@@ -194,6 +197,7 @@ INFORMATION ABOUT YOUR PROSPECT:
           name: { type: "string" },
           email: { type: "string" },
           smsReminderNumber: { type: "string" },
+          timetimeZone:{type: "string"},
         },
         description:
           "You will be having a meeting with an agent to give you more insight regarding your listing interest.",
@@ -213,47 +217,8 @@ INFORMATION ABOUT YOUR PROSPECT:
     reduce_latency: false,
     record: true,
     summary_prompt: `generate the call summary to capture the client's {{name}}, {{email}},{{phoneNumber}},{{propertyMarketType}},{{propertyLocation}},{{propertyDescription}},{{propertyPurpose}},{{propertySizes}},{{budget}},{{leadScore}}, {{userNationality}}, if the client {{userHasBookedAppointment}},{{userWantsToBuyProperty}},{{userWantsToSellProperty}},{{appointmentTime}},{{otherRequirements}},{{callBack}} `,
-    analysis_prompt: `analyze the call to extract the clients name,email, requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
-        - name: The client's {{name}}.
-        - Email Address: The {{email}} address of the client.
-        - Phone Number: The {{phoneNumber}} number of the client.
-        - Property Market Type: The type of {{propertyMarketType}} the client is interested in (off-plan, secondary market).
-        - Property Description: A brief {{propertyDescription}} the client is looking for.
-        - Property Location: The desired {{propertyLocation}} or where the property that intrest the client is situated.
-        - Property Purpose: The {{propertyPurpose}} of the property (e.g., investment, personal use).
-        - Property Sizes: The preferred size(s) of the property {{propertySizes}}.
-        - Budget: The client's {{budget}} for the property.
-        - isLead: Whether the client is a potential lead {{isLead}}(true/false).
-        - Lead Quality Score: A numerical score {{leadScore}} representing the quality of the lead on a scale of 1 to 10.
-        - User Has Booked Appointment: Whether {{userHasBookedAppointment}} the client has booked an appointment (true/false).
-        - User Wants to Buy Property: Whether the client wants to buy a property {{userWantsToBuyProperty}}? (true/false).
-        - User Wants to Sell Property: Whether the client wants to sell a property {{userWantsToSellProperty}}? (true/false).
-        - User Nationality: The nationality of the client {{userNationality}}.
-        - Appointment Time: The selected schedule time for the appointment {{appointmentTime}} in ISO 8601 format .
-        - Other Requirements: Any additional requirements mentioned by the client {{otherRequirements}}.,
-        - call back: Whether the client request for a call back for another time {{callBack}} (true/false).`,
-
-    analysis_schema: {
-      name: String,
-      email_address: String,
-      property_market_type: String,
-      property_description: String,
-      property_location: String,
-      property_purpose: String,
-      property_sizes: String,
-      budget: String,
-      is_lead: Boolean,
-      lead_quality_score: Number,
-      user_has_booked_appointment: Boolean,
-      user_wants_to_buy_property: Boolean,
-      user_wants_to_sell_property: Boolean,
-      user_nationality: String,
-      appointment_time: String,
-      other_requirements: String,
-      call_back: Boolean,
-    },
     temperature: 0.3,
-    timezone: "Africa/Abidjan",
+    timezone: `{{input.timezone}}`,
     interruption_threshold: 150,
     tools: tools,
     webhook: "https://queenevaagentai.com/api/phoneCall/callWebhook",
@@ -393,7 +358,7 @@ app.post("/booker", async (req, res) => {
     name,
     email,
     smsReminderNumber,
-    timeZone = "Asia/Dubai",
+    timeZone,
     language = "en",
     metadata = {},
   } = req.body;
