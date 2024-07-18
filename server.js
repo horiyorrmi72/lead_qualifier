@@ -34,7 +34,7 @@ app.post("/make-call", (req, res) => {
 
   
 ## Response Guideline
-- [Overcome ASR errors]  Don't repeat yoursel, Expect there to be errors. If you can guess what the user is trying to say,  then guess and respond. When you must ask for clarification, pretend that you heard the voice and be colloquial (use phrases like "didn't catch that", "some noise", "pardon", "you're coming through choppy", "static in your speech", "voice is cutting in and out"). Do not ever mention "transcription error".
+- [Overcome ASR errors]  Don't repeat yourself, Expect there to be errors. If you can guess what the user is trying to say,  then guess and respond. When you must ask for clarification, pretend that you heard the voice and be colloquial (use phrases like "didn't catch that", "some noise", "pardon", "you're coming through choppy", "static in your speech", "voice is cutting in and out"). Do not ever mention "transcription error".
 - [Always stick to your role] Think about what your role can and cannot do. If your role cannot do something, try to steer the conversation back to the goal of the conversation and to your role. Don't repeat yourself in doing this. You should still be creative, human-like, and lively.
 - [Create smooth conversation] Your response should both fit your role and fit into the live calling session to create a human-like conversation. You respond directly to what the user just said.
 
@@ -180,7 +180,7 @@ INFORMATION ABOUT YOUR PROSPECT:
         name: "{{input.name}}",
         email: "{{input.email}}",
         smsReminderNumber: "{{input.smsReminderNumber}}",
-        timeZone:"{{input.timeZone}}"
+        timeZone: "{{input.timeZone}}"
       },
       query: {},
       input_schema: {
@@ -197,7 +197,7 @@ INFORMATION ABOUT YOUR PROSPECT:
           name: { type: "string" },
           email: { type: "string" },
           smsReminderNumber: { type: "string" },
-          timetimeZone:{type: "string"},
+          timetimeZone: { type: "string" },
         },
         description:
           "You will be having a meeting with an agent to give you more insight regarding your listing interest.",
@@ -221,6 +221,44 @@ INFORMATION ABOUT YOUR PROSPECT:
     interruption_threshold: 150,
     tools: tools,
     webhook: "https://queenevaagentai.com/api/phoneCall/callWebhook",
+    analysis_prompt: `analyze the call to extract the clients name,email, requirements, needs, and specifics the client is interested in. Ensure to capture details such as the property market type, purpose (investment or personal use), description, location, size, and budget. Also, determine if it is a good lead based on the conversation. The analysis should provide the following details in a structured format:
+        - name: The client's {{name}}.
+        - Email Address: The {{email}} address of the client.
+        - Phone Number: The {{phoneNumber}} number of the client.
+        - Property Market Type: The type of {{propertyMarketType}} the client is interested in (off-plan, secondary market).
+        - Property Description: A brief {{propertyDescription}} the client is looking for.
+        - Property Location: The desired {{propertyLocation}} or where the property that intrest the client is situated.
+        - Property Purpose: The {{propertyPurpose}} of the property (e.g., investment, personal use).
+        - Property Sizes: The preferred size(s) of the property {{propertySizes}}.
+        - Budget: The client's {{budget}} for the property.
+        -IsLead: Whether the client is a potential lead (true/false).
+        -Lead Quality Score: A numerical score {{leadScore}} representing the quality of the lead on a scale of 1 to 10.
+        -User Has Booked Appointment: Whether {{userHasBookedAppointment}} the client has booked an appointment (true/false).
+        -User Wants to Buy Property: Whether the client wants to buy a property {{userWantsToBuyProperty}}? (true/false).
+        -User Wants to Sell Property: Whether the client wants to sell a property {{userWantsToSellProperty}}? (true/false).
+        -User Nationality: The nationality of the client {{userNationality}}.
+        -Appointment Time: The selected schedule time for the appointment {{appointmentTime}} in ISO 8601 format .
+        -Other Requirements: Any additional requirements mentioned by the client {{otherRequirements}}.,
+        -call back: Whether the client request for a call back for another time {{callBack}} (true/false).`,
+    analysis_schema: {
+      name: String,
+      email_address: String,
+      property_market_type: String,
+      property_description: String,
+      property_location: String,
+      property_purpose: String,
+      property_sizes: String,
+      budget: String,
+      is_lead: Boolean,
+      lead_quality_score: Number,
+      user_has_booked_appointment: Boolean,
+      user_wants_to_buy_property: Boolean,
+      user_wants_to_sell_property: Boolean,
+      user_nationality: String,
+      appointment_time: String,
+      other_requirements: String,
+      call_back: Boolean,
+    },
   };
 
   // Dispatch the phone call
@@ -278,7 +316,8 @@ INFORMATION ABOUT YOUR PROSPECT:
 });
 
 async function parseDateQuery(query) {
-  try {
+  try
+  {
     const completion = await openai.chat.completions.create({
       messages: [
         {
@@ -293,60 +332,67 @@ async function parseDateQuery(query) {
 
     const formattedDate = completion.choices[0].message.content.trim();
     return formattedDate;
-  } catch (error) {
+  } catch (error)
+  {
     console.error("Error parsing date query:", error);
     return null;
   }
 }
-  
+
 app.get("/get-available-slots", async (req, res) => {
-    const {
-      eventTypeId,
-      startTime: naturalLanguageStartQuery,
-      endTime: naturalLanguageEndQuery,
-      timeZone = "Asia/Dubai",
-      apiKey = process.env.Bland_cal_key,
-    } = req.query;
+  const {
+    eventTypeId,
+    startTime: naturalLanguageStartQuery,
+    endTime: naturalLanguageEndQuery,
+    timeZone = "Asia/Dubai",
+    apiKey = process.env.Bland_cal_key,
+  } = req.query;
 
-    if (
-      !eventTypeId ||
-      !naturalLanguageStartQuery ||
-      !naturalLanguageEndQuery ||
-      !timeZone ||
-      !apiKey
-    ) {
-      return res.status(400).json({ error: "Missing required parameters" });
+  if (
+    !eventTypeId ||
+    !naturalLanguageStartQuery ||
+    !naturalLanguageEndQuery ||
+    !timeZone ||
+    !apiKey
+  )
+  {
+    return res.status(400).json({ error: "Missing required parameters" });
+  }
+
+  const startTime = await parseDateQuery(naturalLanguageStartQuery);
+  const endTime = await parseDateQuery(naturalLanguageEndQuery);
+
+  if (!startTime || !endTime)
+  {
+    return res.status(500).json({ error: "Failed to parse date queries" });
+  }
+
+  const params = {
+    eventTypeId,
+    startTime,
+    endTime,
+    timeZone,
+    apiKey,
+  };
+
+  // cal endpoint for fetching available slots
+  const url = "https://api.cal.com/v1/slots";
+  try
+  {
+    const response = await axios.get(url, { params });
+    if (response.status === 200)
+    {
+      // console.log(response);
+      res.json(response.data);
+    } else
+    {
+      res.status(response.status).json({ error: response.statusText });
     }
-
-    const startTime = await parseDateQuery(naturalLanguageStartQuery);
-    const endTime = await parseDateQuery(naturalLanguageEndQuery);
-
-    if (!startTime || !endTime) {
-      return res.status(500).json({ error: "Failed to parse date queries" });
-    }
-
-    const params = {
-      eventTypeId,
-      startTime,
-      endTime,
-      timeZone,
-      apiKey,
-    };
-
-    // cal endpoint for fetching available slots
-    const url = "https://api.cal.com/v1/slots";
-    try {
-      const response = await axios.get(url, { params });
-      if (response.status === 200) {
-        // console.log(response);
-        res.json(response.data);
-      } else {
-        res.status(response.status).json({ error: response.statusText });
-      }
-    } catch (error) {
-      console.error("Error fetching available slots:", error);
-      res.status(500).json({ error: "Error fetching available slots" });
-    }
+  } catch (error)
+  {
+    console.error("Error fetching available slots:", error);
+    res.status(500).json({ error: "Error fetching available slots" });
+  }
 });
 
 app.post("/booker", async (req, res) => {
@@ -367,7 +413,8 @@ app.post("/booker", async (req, res) => {
 
   // Validating the parsed start field to ensure it's a proper ISO 8601 datetime string
   const iso8601Regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
-  if (!start || !iso8601Regex.test(start)) {
+  if (!start || !iso8601Regex.test(start))
+  {
     return res.status(400).json({
       message:
         "Invalid datetime format for 'start'. Expected ISO 8601 format (YYYY-MM-DDTHH:MM:SS.sssZ).",
@@ -387,7 +434,8 @@ app.post("/booker", async (req, res) => {
     metadata,
   };
 
-  try {
+  try
+  {
     const response = await axios.post(
       `https://api.cal.com/v1/bookings?apiKey=${apiKey}`,
       data,
@@ -398,7 +446,8 @@ app.post("/booker", async (req, res) => {
       }
     );
     res.status(response.status).json(response.data);
-  } catch (error) {
+  } catch (error)
+  {
     console.error(
       "Error booking appointment:",
       error.response ? error.response.data : error.message
